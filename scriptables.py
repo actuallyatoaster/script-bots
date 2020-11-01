@@ -15,12 +15,22 @@ def removeWhiteSpace(s):
             clean += c
     return clean
 
+#Returns true if expression is a comparison, false otherwise
+def isComparison(expresion, comparators):
+    for comp in comparators:
+        if comp in expression:
+            return True
+    else:
+        return False
+
 '''
 Takes a string, removes whitespace, then splits into list of strings broken up
 By any character in group. The character itself is not removed, but put as its
 own element
 '''
 def splitStrByGroup(s, group):
+    if s in group:
+        return s
     s = removeWhiteSpace(s)
     spl = []
     curr = "" 
@@ -33,11 +43,67 @@ def splitStrByGroup(s, group):
                 spl.append(potentialMatch)
                 i += len(potentialMatch)
                 curr = ""
-                continue
-        curr += s[i]
-        i += 1
+                matched = True
+                break
+        if not matched:
+            curr += s[i]
+            i += 1
     spl.append(curr)
     return(spl)
+
+#returns index of first open paren in string and corresponding closing paren
+def scanParenIndices(expression):
+    startInd = expression.index('(')
+    depth = 0
+    for i in range(startInd+1, len(expression)):
+        if expression[i] == '(':
+            depth += 1
+        elif expression[i] == ')':
+            if depth == 0:
+                return startInd, i
+            else:
+                depth -= 1
+    scriptError("Unmatched parentheses")
+
+# recursively breaks an expression into a list of strings split by parentheses
+def splitParens(expression):
+    spl = []
+
+    if '(' in expression:
+        if not ')' in expression:
+            scriptError("Unmatched parentheses")
+        startInd, endInd = scanParenIndices(expression)
+        if startInd > 0: 
+            spl.extend(splitParens(expression[0:startInd]))
+        spl.append(splitParens(expression[startInd + 1: endInd]))
+        if endInd < len(expression) - 1:
+            spl.extend(splitParens(expression[endInd+1:]))
+    else:
+        return expression
+
+    return spl
+
+#recursively parse sub-expressions
+def parseSubExpr(subExpr, group):
+    if not isinstance(subExpr, list):
+        return splitStrByGroup(subExpr, group)
+    else:
+        subExprList = []
+        for subSubExpr in subExpr:
+            subExprList.append(parseSubExpr(subSubExpr, group))
+        return subExprList
+
+#Parse an expression in string form, return tokenized expression
+def parseExpression(expression, group):
+    spl = splitParens(expression)
+    print(spl)
+    if isinstance(spl, list):
+        for i in range(len(spl)):
+            spl[i] = parseSubExpr(spl[i], group)
+        return spl
+    else:
+        return splitStrByGroup(expression, group)
+    
 
 # Generic variable type
 class ScriptVariable():
@@ -106,6 +172,8 @@ class ScriptEnvironment():
 
     def loadScript(self, script):
         pass
+    def getVariableOrConstant(self, var):
+        pass
     def evaluateExpression(self, expression):
         '''
         A legal expression takes one of two forms:
@@ -118,15 +186,38 @@ class ScriptEnvironment():
         '''
         operators = ['+', '-', '/', '*', '**', '//', '!']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
-        splitExpr = splitStrByGroup(expr, operators)
-        splitComp = splitStrByGroup(expr, comparators)
+        spl = parseExpression(expression)
 
-        if len(splitComp) > 1:
-            # Expression is a boolean comparison (type 3)
-        elif len(splitExpr) > 1:
-            # Expression is type 2
-        else:
-            # Expression is type 1
+        isComparison = False
+        opIndex = 0
+
+        if len(spl) == 1:
+            return self.getVariableOrConstant(spl[0])
+
+        for i in range(len(spl)):
+            if spl[i] in operators:
+                opIndex = i
+                break
+
+        for i in range(len(spl)):
+            subExpr = spl[i]
+            if subExpr in comparators:
+                isComparison = True
+                opIndex = i
+                break
+
+        
+        # if len(splitComp) > 1:
+        #     # Expression is a comparison (type 3)
+        # elif len(splitExpr) > 1:
+        #     # Expression is type 2
+        # else:
+        #     # Expression is type 1
         
     def executeStep(self):
         pass
+
+if __name__ == "__main__":
+    operators = ['+', '-', '/', '*', '**', '//', '!']
+    x = parseExpression("((abc+d)*(c/d)+5)/t", operators)
+    print(x)
