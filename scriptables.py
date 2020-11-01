@@ -7,6 +7,13 @@ SCRIPT_CONFIG = {
 def scriptError(err):
     print(err)
 
+# removes excess outer lists from L
+# Ex. deNest([['x']]) == 'x'; deNest([[['x', 'y']]]) == ['x', 'y']
+def deNest(L):
+    if isinstance(L, list) and len(L) == 1:
+        return deNest(L[0])
+    else: return L
+
 # removes *all* whitespace in a string
 def removeWhiteSpace(s):
     clean = ""
@@ -16,9 +23,12 @@ def removeWhiteSpace(s):
     return clean
 
 #Returns true if expression is a comparison, false otherwise
-def isComparison(expresion, comparators):
+def isBoolExpression(expresion, comparators, boolOps):
     for comp in comparators:
         if comp in expression:
+            return True
+    for op in boolOps:
+        if op in expression:
             return True
     else:
         return False
@@ -49,7 +59,7 @@ def splitStrByGroup(s, group):
             curr += s[i]
             i += 1
     spl.append(curr)
-    return(spl)
+    return(deNest(spl))
 
 #returns index of first open paren in string and corresponding closing paren
 def scanParenIndices(expression):
@@ -93,7 +103,7 @@ def parseSubExpr(subExpr, group):
             subExprList.append(parseSubExpr(subSubExpr, group))
         return subExprList
 
-#Parse an expression in string form, return tokenized expression
+#Parse an expression in string form, return parsed expression
 def parseExpression(expression, group):
     spl = splitParens(expression)
     print(spl)
@@ -174,37 +184,36 @@ class ScriptEnvironment():
         pass
     def getVariableOrConstant(self, var):
         pass
+
+    def evaluateBoolExpression(self, tokens):
+        pass
+    def evaluateSubExpression(self, tokens):
+        pass
+
     def evaluateExpression(self, expression):
         '''
         A legal expression takes one of two forms:
         1) variable
         2) variable operator expression
-        3) expression comparator expresiion
+        3) expression comparator expresiion (bool expression)
         So we split by legal operators, and if length is one just return the
         variable, otherwise we recursively evaluate the expression and apply
         the operator
         '''
-        operators = ['+', '-', '/', '*', '**', '//', '!']
+        operators = ['+', '-', '/', '*', '**', '//']
+        boolOperators = ['!', '&&', '||']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
-        spl = parseExpression(expression)
+        #tokens = parseExpression(expression)
 
-        isComparison = False
-        opIndex = 0
-
-        if len(spl) == 1:
+        if len(tokens) == 1:
             return self.getVariableOrConstant(spl[0])
+        elif isBoolExpression(expression, comparators, boolOperators):
+            parsed = parseExpression(expression, comparators + boolOperators)
+            return self.evaluateBoolExpression(parsed)
+        else:
+            parsed = parseExpression(expression, operators)
+            return self.evaluateSubExpression(parsed)
 
-        for i in range(len(spl)):
-            if spl[i] in operators:
-                opIndex = i
-                break
-
-        for i in range(len(spl)):
-            subExpr = spl[i]
-            if subExpr in comparators:
-                isComparison = True
-                opIndex = i
-                break
 
         
         # if len(splitComp) > 1:
