@@ -49,7 +49,7 @@ def splitStrByGroup(s, group):
         matched = False
         for potentialMatch in reversed(sorted(group, key=len)):
             if s[i:i+len(potentialMatch)] == potentialMatch:
-                spl.append(curr)
+                if curr != "": spl.append(curr)
                 spl.append(potentialMatch)
                 i += len(potentialMatch)
                 curr = ""
@@ -58,8 +58,8 @@ def splitStrByGroup(s, group):
         if not matched:
             curr += s[i]
             i += 1
-    spl.append(curr)
-    return(deNest(spl))
+    if curr != "": spl.append(curr)
+    return(spl)
 
 #returns index of first open paren in string and corresponding closing paren
 def scanParenIndices(expression):
@@ -110,11 +110,35 @@ def parseSubExpr(subExpr, group):
 def parseExpression(expression, group):
     spl = splitParens(expression)
     if isinstance(spl, list):
-        for i in range(len(spl)):
-            spl[i] = parseSubExpr(spl[i], group)
-        return deNest(spl)
+        i = 0
+        while i <len(spl):
+            parsedSub = parseSubExpr(spl[i], group)
+            #Case where the parsed expression only has one element
+            if len(parsedSub) == 1:
+                spl[i] = parsedSub
+                i += 1
+            #Case where the last character in the sub expr is an operator
+            elif parsedSub[-1] in group and parsedSub[0] not in group:
+                spl[i] = parsedSub[0:-1]
+                spl.insert(i+1, parsedSub[-1])
+                i += 2
+            #Case where first character is an operators
+            elif parsedSub[0] in group and parsedSub[1] not in group:
+                spl[i] = parsedSub[0]
+                spl.insert(i+1, parsedSub[1:])
+                i += 2
+            #Case where first and last characters are both operators
+            elif parsedSub[0] in group and parsedSub[1] in group:
+                spl[i] = parsedSub[0]
+                spl.insert(i+1, parsedSub[1:-1])
+                spl.insert(i+2, parsedSub[-1])
+                i += 3
+            else:
+                spl[i] = parseSubExpr(spl[i], group)
+                i += 1
+        return spl
     else:
-        return deNest(splitStrByGroup(expression, group))
+        return splitStrByGroup(expression, group)
     
 
 # Generic variable type
@@ -215,7 +239,7 @@ class ScriptEnvironment():
                 lhs = self.evaluateSubExpression(tokens[0])
                 operator = tokens[1]
                 rhs = self.evaluateSubExpression(tokens[2:])
-                print(lhs, tokens[0], rhs, tokens[1])
+                print(lhs, tokens[0], rhs, tokens[2])
 
                 if rhs.type != lhs.type:
                     scriptError(f"Cannot use operator {operator} with " +
@@ -285,6 +309,7 @@ class ScriptEnvironment():
         pass
 
 if __name__ == "__main__":
+    #Setup a script environment for debugging purposes
     operators = ['+', '-', '/', '*', '**', '//', '!']
     x = parseExpression("((abc+d)*(c/d)+5)/t", operators)
     locs = {'abc':ScriptNumber(1), 'y':ScriptNumber(2)}
