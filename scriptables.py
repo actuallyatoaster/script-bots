@@ -1,11 +1,19 @@
+# TODO: all the code relating to parsing expressions is really messy and should
+# be reworked if time allows
 import string
 
+#Some configuration for the script environment
+#TODO: move this to a config file
 SCRIPT_CONFIG = {
     "NUM_INT_TOLERANCE": 10**(-4),# tolerance for floats to be converted to ints
 }
 
 def scriptError(err):
     print(err)
+
+################################################################################
+### Helper functions for expression parsing                                  ###
+################################################################################
 
 # removes excess outer lists from L
 # Ex. deNest([['x']]) == 'x'; deNest([[['x', 'y']]]) == ['x', 'y']
@@ -141,13 +149,17 @@ def parseExpression(expression, group):
         return splitStrByGroup(expression, group)
     
 
+################################################################################
+### Script data types and environment                                        ###
+################################################################################
+
 # Generic variable type
 class ScriptVariable():
     def __init__(self, type, value):
         self.type = type
         self.value = value
 
-#T his is just a boolean
+# This is just a boolean
 class ScriptBoolean(ScriptVariable):
     def __init__(self, value):
         super().__init__("bool", value)
@@ -306,6 +318,7 @@ class ScriptEnvironment():
         #     # Expression is type 1
         
     def executeStep(self):
+        instrIndex = 0
         pass
 
 if __name__ == "__main__":
