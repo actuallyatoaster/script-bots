@@ -23,7 +23,7 @@ def removeWhiteSpace(s):
     return clean
 
 #Returns true if expression is a comparison, false otherwise
-def isBoolExpression(expresion, comparators, boolOps):
+def isBoolExpression(expression, comparators, boolOps):
     for comp in comparators:
         if comp in expression:
             return True
@@ -80,14 +80,17 @@ def splitParens(expression):
     spl = []
 
     if '(' in expression:
-        if not ')' in expression:
+        if not ')' in expression: 
             scriptError("Unmatched parentheses")
         startInd, endInd = scanParenIndices(expression)
-        if startInd > 0: 
-            spl.extend(splitParens(expression[0:startInd]))
+        if startInd > 0:
+            spl.append(expression[0:startInd])
         spl.append(splitParens(expression[startInd + 1: endInd]))
         if endInd < len(expression) - 1:
-            spl.extend(splitParens(expression[endInd+1:]))
+            if '(' in expression[endInd+1:]:
+                spl.extend(splitParens(expression[endInd+1:]))
+            else:
+                spl.append(expression[endInd+1:])
     else:
         return expression
 
@@ -106,13 +109,12 @@ def parseSubExpr(subExpr, group):
 #Parse an expression in string form, return parsed expression
 def parseExpression(expression, group):
     spl = splitParens(expression)
-    print(spl)
     if isinstance(spl, list):
         for i in range(len(spl)):
             spl[i] = parseSubExpr(spl[i], group)
-        return spl
+        return deNest(spl)
     else:
-        return splitStrByGroup(expression, group)
+        return deNest(splitStrByGroup(expression, group))
     
 
 # Generic variable type
@@ -169,26 +171,80 @@ class ScriptCollection(ScriptVariable):
             scriptError(f"Element type {self.value[key].type} different from \
             f{var.type}")
 
+#TODO: this function needs to support floats
+def stringToScriptNumber(s):
+    return ScriptNumber(int(s))
+
 #Environment for script to run in
 class ScriptEnvironment():
-    def __init__(self, constants, externals):
+    def __init__(self, constants = dict(), externals = dict()):
         # Constants - cannot be changed within scripts
         # Externals - can be changed within scripts, returned by executeStep()
         # Externals are used as the way to get output from the script
-        self.locals = dict()
+        self.locs = dict()
         self.constants = constants
         self.externals = externals
         self.instructionIndex = 0
 
     def loadScript(self, script):
         pass
+
     def getVariableOrConstant(self, var):
-        pass
+        if var.isdigit(): #TODO: support floats
+            return stringToScriptNumber(var)
+        elif var in self.externals:
+            return self.externals[var]
+        elif var in self.constants:
+            return self.constants[var]
+        elif var in self.locs:
+            return self.locs[var]
+        else:
+            scriptError(f"Variable {var} is not defined")
 
     def evaluateBoolExpression(self, tokens):
         pass
+
+    #This handles expression types 1 and 2
     def evaluateSubExpression(self, tokens):
-        pass
+        tokens = deNest(tokens)
+
+        #Type 1
+        if isinstance(tokens, list) and len(tokens) > 1:
+            if len(tokens) >= 3:
+                print(tokens)
+                lhs = self.evaluateSubExpression(tokens[0])
+                operator = tokens[1]
+                rhs = self.evaluateSubExpression(tokens[2:])
+                print(lhs, tokens[0], rhs, tokens[1])
+
+                if rhs.type != lhs.type:
+                    scriptError(f"Cannot use operator {operator} with " +
+                        f"types {rhs.type} and {lhs.type}")
+                
+                if operator == '+':
+                    return ScriptNumber(lhs.value + rhs.value)
+                elif operator == '-':
+                    return ScriptNumber(lhs.value - rhs.value)
+                elif operator == '/':
+                    return ScriptNumber(lhs.value / rhs.value)
+                elif operator == '*':
+                    return ScriptNumber(lhs.value * rhs.value)
+                elif operator == '**':
+                    return ScriptNumber(lhs.value** rhs.value)
+                elif operator == '//':
+                    return ScriptNumber(lhs.value// rhs.value)
+                elif operator == '%':
+                    return ScriptNumber(lhs.value % rhs.value)
+                
+            else: 
+                scriptError("Improper expression")
+                return
+
+        #Type 2
+        elif not isinstance(tokens, list):
+            return self.getVariableOrConstant(tokens)
+        elif len(tokens) == 1:
+            return self.getVariableOrConstant(tokens[0])
 
     def evaluateExpression(self, expression):
         '''
@@ -200,18 +256,20 @@ class ScriptEnvironment():
         variable, otherwise we recursively evaluate the expression and apply
         the operator
         '''
-        operators = ['+', '-', '/', '*', '**', '//']
+        operators = ['+', '-', '/', '*', '%', '**', '//']
         boolOperators = ['!', '&&', '||']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
         #tokens = parseExpression(expression)
 
-        if len(tokens) == 1:
-            return self.getVariableOrConstant(spl[0])
-        elif isBoolExpression(expression, comparators, boolOperators):
-            parsed = parseExpression(expression, comparators + boolOperators)
+        if isBoolExpression(expression, comparators, boolOperators):
+            parsed = deNest(parseExpression(expression, comparators + boolOperators))
+            if len(parsed) == 1:
+                return self.getVariableOrConstant(spl[0])
             return self.evaluateBoolExpression(parsed)
         else:
-            parsed = parseExpression(expression, operators)
+            parsed = deNest(parseExpression(expression, operators))
+            if len(parsed) == 1:
+                return self.getVariableOrConstant(spl[0])
             return self.evaluateSubExpression(parsed)
 
 
@@ -229,4 +287,6 @@ class ScriptEnvironment():
 if __name__ == "__main__":
     operators = ['+', '-', '/', '*', '**', '//', '!']
     x = parseExpression("((abc+d)*(c/d)+5)/t", operators)
-    print(x)
+    locs = {'abc':ScriptNumber(1), 'y':ScriptNumber(2)}
+    env = ScriptEnvironment()
+    env.locs = locs
