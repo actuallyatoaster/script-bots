@@ -65,8 +65,8 @@ class ScriptNumber(ScriptVariable):
             scriptErorr(f"Assignment is not of type {self.type}")
             return
         val = var.value
-        if abs(val - int(val)) < SCRIPT_CONFIG["NUM_INT_TOLERANCE"]:
-            val = int(val)
+        if abs(val - round(val)) < SCRIPT_CONFIG["NUM_INT_TOLERANCE"]:
+            val = round(val)
         self.value = val
 
 # This is just a string.        
