@@ -1,3 +1,9 @@
+'''
+This file contains the BotScript interpreter and all related classes and
+functions. The core of the file is the ScriptEnvironment class, wherein scripts
+and their variables are stored, and scripts are parsed and run.
+'''
+
 # TODO: all the code relating to parsing expressions is really messy and should
 # be reworked if time allows
 import string
@@ -8,8 +14,13 @@ SCRIPT_CONFIG = {
     "NUM_INT_TOLERANCE": 10**(-4),# tolerance for floats to be converted to ints
 }
 
+#Error type used for errors within scripts
+class ScriptError(Exception):
+    pass
+
 def scriptError(err):
     print(err)
+    raise ScriptError
 
 ################################################################################
 ### Helper functions for expression parsing                                  ###
@@ -46,6 +57,13 @@ def isComparison(expression, comparators):
         if comp in expression:
             return True
     return False
+
+#Finds the first element of group that exists in L and returns its index in L
+def findGroupIndex(L, group):
+    for i in group:
+        if i in L:
+            return L.index(i)
+    return -1 #return -1 if not found
 
 '''
 Takes a string, removes whitespace, then splits into list of strings broken up
@@ -155,6 +173,34 @@ def parseExpression(expression, group):
     else:
         return splitStrByGroup(expression, group)
     
+#Takes a list of tokens that has at least one '!'. The '!' element is merged
+#With the next element in the list
+#ex. ['True', '&&', '!', 'False'] --> ['True', '&&', ['!', 'False']]
+# ['True' '&&', '!', ['False', '&&', 'True]]
+# --> ['True' '&&', ['!', ['False', '&&', 'True]]]
+#NOTE: this function is a recipe for alias hell if used incorrectly
+def bangPreprocessor(tokens):
+    new = []
+    first = -1
+    i = 0
+    while i < len(tokens):
+        if tokens[i] == '!':
+            new.append([tokens[i], tokens[i+1]])
+            if first == -1: first = i
+            i +=2
+        else:
+            new.append(tokens[i])
+            i+=1
+    #Parsing things with '!' can create a few artifacts that we need to remove
+    if isinstance(new[0], list) and first != 0:
+        new = new[0] + new[1:]
+    i = 0
+    while i < len(new):
+        if new[i] == []:
+            new.pop(i)
+        i += 1
+
+    return new
 
 ################################################################################
 ### Script data types and environment                                        ###
@@ -252,7 +298,7 @@ class ScriptEnvironment():
     # Recursively evaluates parsed boolean expressions
     def evaluateBoolExpression(self, tokens, comparators):
         tokens  = deNest(tokens)
-        print(tokens)
+        #print(tokens)
         #Special case for ! operator
         if len(tokens) == 2:
             if tokens[0] != "!":
@@ -262,19 +308,26 @@ class ScriptEnvironment():
             return ScriptBoolean(not rhs.value)
         elif len(tokens) > 2 and "!" in tokens:
             #This is really janky, i know
+            print(tokens)
             tokens = bangPreprocessor(tokens)
-            return self.evaluateBoolExpression(tokens)
+            print(tokens)
+            return self.evaluateBoolExpression(tokens, comparators)
 
         #Numerical Comparisons
         if isinstance(tokens, list):
             if len(tokens) == 1:
                 return self.getVariableOrConstant(tokens[0])
             elif isComparison(tokens, comparators):
-                
-                lhs = self.evaluateSubExpression(tokens[0])
-                comparator = deNest(tokens[1])
-                rhs = self.evaluateSubExpression(tokens[2:])
-                print(tokens[0],"----", tokens[1])
+
+                compIndex = findGroupIndex(tokens, comparators)
+                if compIndex == 0 or compIndex == len(tokens) -1:
+                    scriptError("Improper expression")
+                    return
+
+                lhs = self.evaluateSubExpression(tokens[0:compIndex])
+                comparator = deNest(tokens[compIndex])
+                rhs = self.evaluateSubExpression(tokens[compIndex+1:])
+                #print(tokens[0],"----", tokens[1])
                 if comparator == '<':
                     return ScriptBoolean(lhs.value < rhs.value)
                 elif comparator == '>':
@@ -366,7 +419,7 @@ class ScriptEnvironment():
             #Evaluate as a boolean expression
             parsed = deNest(parseExpression(expression, comparators + boolOperators + operators))
             if len(parsed) == 1:
-                return self.getVariableOrConstant(spl[0])
+                return self.getVariableOrConstant(parsed[0])
             return self.evaluateBoolExpression(parsed, comparators)
         else:
             #Evaluate as a numerical expression
