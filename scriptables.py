@@ -38,8 +38,14 @@ def isBoolExpression(expression, comparators, boolOps):
     for op in boolOps:
         if op in expression:
             return True
-    else:
-        return False
+    return False
+
+#Basically the same as isBoolExpression
+def isComparison(expression, comparators):
+    for comp in comparators:
+        if comp in expression:
+            return True
+    return False
 
 '''
 Takes a string, removes whitespace, then splits into list of strings broken up
@@ -90,6 +96,7 @@ def splitParens(expression):
     if '(' in expression:
         if not ')' in expression: 
             scriptError("Unmatched parentheses")
+            return
         startInd, endInd = scanParenIndices(expression)
         if startInd > 0:
             spl.append(expression[0:startInd])
@@ -228,6 +235,10 @@ class ScriptEnvironment():
     def getVariableOrConstant(self, var):
         if var.isdigit(): #TODO: support floats
             return stringToScriptNumber(var)
+        elif var == "True":
+            return ScriptBoolean(True)
+        elif var == "False":
+            return ScriptBoolean(False)
         elif var in self.externals:
             return self.externals[var]
         elif var in self.constants:
@@ -237,10 +248,53 @@ class ScriptEnvironment():
         else:
             scriptError(f"Variable {var} is not defined")
 
-    def evaluateBoolExpression(self, tokens):
-        pass
+    # Recursively evaluates parsed boolean expressions
+    def evaluateBoolExpression(self, tokens, comparators):
+        tokens  = deNest(tokens)
+        #print(tokens)
+        if len(tokens) == 2:
+            scriptError("Improper expression")
+            return
 
-    #This handles expression types 1 and 2
+        if isinstance(tokens, list):
+            if len(tokens) == 1:
+                return self.getVariableOrConstant(tokens[0])
+            elif isComparison(tokens, comparators):
+                lhs = self.evaluateBoolExpression(tokens[0], comparators)
+                comparator = deNest(tokens[1])
+                rhs = self.evaluateBoolExpression(tokens[2:], comparators)
+                
+                if comparator == '<':
+                    return ScriptBoolean(lhs.value < rhs.value)
+                elif comparator == '>':
+                    return ScriptBoolean(lhs.value > rhs.value)
+                elif comparator == '<=':
+                    return ScriptBoolean(lhs.value <= rhs.value)
+                elif comparator == '>=':
+                    return ScriptBoolean(lhs.value >= rhs.value)
+                elif comparator == '==':
+                    return ScriptBoolean(lhs.value == rhs.value)
+                elif comparator == '!=':
+                    return ScriptBoolean(lhs.value != rhs.value)
+                
+            else:
+                lhs = self.evaluateBoolExpression(tokens[0], comparators)
+                operator = deNest(tokens[1])
+                rhs = self.evaluateBoolExpression(tokens[2:], comparators)
+                print(tokens[0], lhs.value, operator, tokens[2:], rhs.value)
+                if operator  == '&&':
+                    return ScriptBoolean(lhs.value and rhs.value)
+                elif operator  == '||':
+                    return ScriptBoolean(lhs.value or rhs.value)
+                elif operator  == '&!':
+                    return ScriptBoolean(lhs.value and (not rhs.value))
+                elif operator  == '|!':
+                    return ScriptBoolean(lhs.value or (not rhs.value))
+
+        else:
+            return self.getVariableOrConstant(tokens)
+
+    #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
         tokens = deNest(tokens)
 
@@ -249,7 +303,7 @@ class ScriptEnvironment():
             if len(tokens) >= 3:
                 print(tokens)
                 lhs = self.evaluateSubExpression(tokens[0])
-                operator = tokens[1]
+                operator = deNest(tokens[1])
                 rhs = self.evaluateSubExpression(tokens[2:])
                 print(lhs, tokens[0], rhs, tokens[2])
 
@@ -293,29 +347,21 @@ class ScriptEnvironment():
         the operator
         '''
         operators = ['+', '-', '/', '*', '%', '**', '//']
-        boolOperators = ['!', '&&', '||']
+        boolOperators = ['&&', '||', '&!', '|!']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
-        #tokens = parseExpression(expression)
 
         if isBoolExpression(expression, comparators, boolOperators):
+            #Evaluate as a boolean expression
             parsed = deNest(parseExpression(expression, comparators + boolOperators))
             if len(parsed) == 1:
                 return self.getVariableOrConstant(spl[0])
-            return self.evaluateBoolExpression(parsed)
+            return self.evaluateBoolExpression(parsed, comparators)
         else:
+            #Evaluate as a numerical expression
             parsed = deNest(parseExpression(expression, operators))
-            if len(parsed) == 1:
-                return self.getVariableOrConstant(spl[0])
+            if len(parsed) == 1: #TODO: i think this and corresponding in bool expression can be removed
+                return self.getVariableOrConstant(parsed[0])
             return self.evaluateSubExpression(parsed)
-
-
-        
-        # if len(splitComp) > 1:
-        #     # Expression is a comparison (type 3)
-        # elif len(splitExpr) > 1:
-        #     # Expression is type 2
-        # else:
-        #     # Expression is type 1
         
     def executeStep(self):
         instrIndex = 0
@@ -325,6 +371,6 @@ if __name__ == "__main__":
     #Setup a script environment for debugging purposes
     operators = ['+', '-', '/', '*', '**', '//', '!']
     x = parseExpression("((abc+d)*(c/d)+5)/t", operators)
-    locs = {'abc':ScriptNumber(1), 'y':ScriptNumber(2)}
+    locs = {'t':ScriptBoolean(True), 'f':ScriptBoolean(False)}
     env = ScriptEnvironment()
     env.locs = locs
