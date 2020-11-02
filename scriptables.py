@@ -180,6 +180,7 @@ as a float.
 class ScriptNumber(ScriptVariable):
     def __init__(self, value):
         super().__init__("num", value)
+        self.assign(self)
 
     def assign(self, var):
         if not var.type == self.type:
@@ -251,19 +252,29 @@ class ScriptEnvironment():
     # Recursively evaluates parsed boolean expressions
     def evaluateBoolExpression(self, tokens, comparators):
         tokens  = deNest(tokens)
-        #print(tokens)
+        print(tokens)
+        #Special case for ! operator
         if len(tokens) == 2:
-            scriptError("Improper expression")
-            return
+            if tokens[0] != "!":
+                scriptError("Improper expression")
+                return
+            rhs = self.evaluateBoolExpression(tokens[1], comparators)
+            return ScriptBoolean(not rhs.value)
+        elif len(tokens) > 2 and "!" in tokens:
+            #This is really janky, i know
+            tokens = bangPreprocessor(tokens)
+            return self.evaluateBoolExpression(tokens)
 
+        #Numerical Comparisons
         if isinstance(tokens, list):
             if len(tokens) == 1:
                 return self.getVariableOrConstant(tokens[0])
             elif isComparison(tokens, comparators):
-                lhs = self.evaluateBoolExpression(tokens[0], comparators)
-                comparator = deNest(tokens[1])
-                rhs = self.evaluateBoolExpression(tokens[2:], comparators)
                 
+                lhs = self.evaluateSubExpression(tokens[0])
+                comparator = deNest(tokens[1])
+                rhs = self.evaluateSubExpression(tokens[2:])
+                print(tokens[0],"----", tokens[1])
                 if comparator == '<':
                     return ScriptBoolean(lhs.value < rhs.value)
                 elif comparator == '>':
@@ -276,12 +287,13 @@ class ScriptEnvironment():
                     return ScriptBoolean(lhs.value == rhs.value)
                 elif comparator == '!=':
                     return ScriptBoolean(lhs.value != rhs.value)
-                
+
+            #Boolean operations  
             else:
                 lhs = self.evaluateBoolExpression(tokens[0], comparators)
                 operator = deNest(tokens[1])
                 rhs = self.evaluateBoolExpression(tokens[2:], comparators)
-                print(tokens[0], lhs.value, operator, tokens[2:], rhs.value)
+                #print(tokens[0], lhs.value, operator, tokens[2:], rhs.value)
                 if operator  == '&&':
                     return ScriptBoolean(lhs.value and rhs.value)
                 elif operator  == '||':
@@ -290,7 +302,7 @@ class ScriptEnvironment():
                     return ScriptBoolean(lhs.value and (not rhs.value))
                 elif operator  == '|!':
                     return ScriptBoolean(lhs.value or (not rhs.value))
-
+        #Constant/variable
         else:
             return self.getVariableOrConstant(tokens)
 
@@ -301,11 +313,11 @@ class ScriptEnvironment():
         #Type 1
         if isinstance(tokens, list) and len(tokens) > 1:
             if len(tokens) >= 3:
-                print(tokens)
+                #print(tokens)
                 lhs = self.evaluateSubExpression(tokens[0])
                 operator = deNest(tokens[1])
                 rhs = self.evaluateSubExpression(tokens[2:])
-                print(lhs, tokens[0], rhs, tokens[2])
+                #print(lhs, tokens[0], rhs, tokens[2])
 
                 if rhs.type != lhs.type:
                     scriptError(f"Cannot use operator {operator} with " +
@@ -347,12 +359,12 @@ class ScriptEnvironment():
         the operator
         '''
         operators = ['+', '-', '/', '*', '%', '**', '//']
-        boolOperators = ['&&', '||', '&!', '|!']
+        boolOperators = ['&&', '||', '&!', '|!', '!']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
 
         if isBoolExpression(expression, comparators, boolOperators):
             #Evaluate as a boolean expression
-            parsed = deNest(parseExpression(expression, comparators + boolOperators))
+            parsed = deNest(parseExpression(expression, comparators + boolOperators + operators))
             if len(parsed) == 1:
                 return self.getVariableOrConstant(spl[0])
             return self.evaluateBoolExpression(parsed, comparators)
@@ -367,10 +379,15 @@ class ScriptEnvironment():
         instrIndex = 0
         pass
 
+def repl(env):
+    inp = input("S>> ")
+    while inp != "exit":
+        print(env.evaluateExpression(inp).value)
+        inp = input("S>> ")
+
 if __name__ == "__main__":
     #Setup a script environment for debugging purposes
-    operators = ['+', '-', '/', '*', '**', '//', '!']
-    x = parseExpression("((abc+d)*(c/d)+5)/t", operators)
     locs = {'t':ScriptBoolean(True), 'f':ScriptBoolean(False)}
     env = ScriptEnvironment()
     env.locs = locs
+    repl(env)
