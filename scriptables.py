@@ -7,6 +7,7 @@ and their variables are stored, and scripts are parsed and run.
 # TODO: all the code relating to parsing expressions is really messy and should
 # be reworked if time allows
 import string
+import math
 
 #Some configuration for the script environment
 #TODO: move this to a config file
@@ -261,9 +262,12 @@ class ScriptCollection(ScriptVariable):
             scriptError(f"Element type {self.value[key].type} different from \
             f{var.type}")
 
-#TODO: this function needs to support floats
+#Convert a string to a ScriptNumber
 def stringToScriptNumber(s):
-    return ScriptNumber(int(s))
+    if '.' in s:
+        return ScriptNumber(float(s))
+    else:
+        return ScriptNumber(int(s))
 
 #Environment for script to run in
 class ScriptEnvironment():
@@ -279,21 +283,60 @@ class ScriptEnvironment():
     def loadScript(self, script):
         pass
 
+    #This function takes a constant or variable and returns its value
+    #Also handles the following builtin functions: cos, sin, tan, arccos,
+    #arcsin, arctan, abs, floor, ceil, round
     def getVariableOrConstant(self, var):
-        if var.isdigit(): #TODO: support floats
-            return stringToScriptNumber(var)
-        elif var == "True":
-            return ScriptBoolean(True)
-        elif var == "False":
-            return ScriptBoolean(False)
-        elif var in self.externals:
-            return self.externals[var]
-        elif var in self.constants:
-            return self.constants[var]
-        elif var in self.locs:
-            return self.locs[var]
+        builtins = {"cos", "sin", "tan", "arccos", "arcsin", "arctan", "abs",
+                    "floor", "ceil", "round"}
+        spl = var.split(':')
+
+        
+        if len(spl) == 1:
+            #Just a single variable or constant to return value of
+            if var.isdigit(): #TODO: support floats
+                return stringToScriptNumber(var)
+            elif var == "True":
+                return ScriptBoolean(True)
+            elif var == "False":
+                return ScriptBoolean(False)
+            elif var in self.externals:
+                return self.externals[var]
+            elif var in self.constants:
+                return self.constants[var]
+            elif var in self.locs:
+                return self.locs[var]
+            else:
+                scriptError(f"Variable {var} is not defined")
+        elif spl[-1] in builtins:
+            target = self.evaluateExpression(":".join(spl[0:-1])).value
+            #Utilizing a buiiltin function
+            if spl[-1] == "cos":
+                return ScriptNumber(math.cos(target))
+            elif spl[-1] == "tan":
+                return ScriptNumber(math.tan(target))
+            elif spl[-1] == "arccos":
+                return ScriptNumber(math.arccos(target))
+            elif spl[-1] == "sin":
+                return ScriptNumber(math.sin(target))
+            elif spl[-1] == "arcsin":
+                return ScriptNumber(math.arcsin(target))
+            elif spl[-1] == "arctan":
+                return ScriptNumber(math.arctan(target))
+            elif spl[-1] == "abs":
+                return ScriptNumber(math.abs(target))
+            elif spl[-1] == "floor":
+                return ScriptNumber(math.floor(target))
+            elif spl[-1] == "ceil":
+                return ScriptNumber(math.ceil(target))
+            elif spl[-1] == "round":
+                return ScriptNumber(math.round(target))
+
         else:
-            scriptError(f"Variable {var} is not defined")
+            pass
+            #TODO: this
+            #Accessing an element of a ScriptCollection
+        
 
     # Recursively evaluates parsed boolean expressions
     def evaluateBoolExpression(self, tokens, comparators):
@@ -381,12 +424,18 @@ class ScriptEnvironment():
                 elif operator == '-':
                     return ScriptNumber(lhs.value - rhs.value)
                 elif operator == '/':
+                    if rhs.value == 0:
+                        scriptError("Dividing by zero!")
+                        return
                     return ScriptNumber(lhs.value / rhs.value)
                 elif operator == '*':
                     return ScriptNumber(lhs.value * rhs.value)
                 elif operator == '**':
                     return ScriptNumber(lhs.value** rhs.value)
                 elif operator == '//':
+                    if rhs.value == 0:
+                        scriptError("Dividing by zero!")
+                        return
                     return ScriptNumber(lhs.value// rhs.value)
                 elif operator == '%':
                     return ScriptNumber(lhs.value % rhs.value)
