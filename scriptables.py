@@ -197,7 +197,9 @@ def bangPreprocessor(tokens):
             i+=1
     #Parsing things with '!' can create a few artifacts that we need to remove
     if isinstance(new[0], list) and first != 0:
+        print(new)
         new = new[0] + new[1:]
+        print(new)
     i = 0
     while i < len(new):
         if new[i] == []:
@@ -312,7 +314,7 @@ class ScriptEnvironment():
             return self.locs[var]
         else:
             scriptError(f"Variable {var} is not defined")
-            
+
     #Set a variable            
     def setVariable(self, var, value):
         varTypes = ["num", "str", "bool"]
@@ -343,16 +345,14 @@ class ScriptEnvironment():
         #print(tokens)
         #Special case for ! operator
         if len(tokens) == 2:
-            if tokens[0] != "!":
+            if deNest(tokens[0]) != "!":
                 scriptError("Improper expression")
                 return
             rhs = self.evaluateBoolExpression(tokens[1], comparators)
             return ScriptBoolean(not rhs.value)
         elif len(tokens) > 2 and "!" in tokens:
-            #This is really janky, i know
-            print(tokens)
+            #This is really janky, i know 
             tokens = bangPreprocessor(tokens)
-            print(tokens)
             return self.evaluateBoolExpression(tokens, comparators)
 
         #Numerical Comparisons
