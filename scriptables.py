@@ -23,6 +23,9 @@ def scriptError(err):
     print(err)
     raise ScriptError
 
+def scriptLog(msg):
+    print(msg) #temp!!!!!
+
 ################################################################################
 ### Helper functions for expression parsing                                  ###
 ################################################################################
@@ -212,6 +215,13 @@ class ScriptVariable():
     def __init__(self, type, value):
         self.type = type
         self.value = value
+    def assign(self, var):
+        if not var.type == self.type:
+            scriptErorr(f"Assignment is not of type {self.type}")
+            return
+        else:
+            self.value = var.value
+
 
 # This is just a boolean
 class ScriptBoolean(ScriptVariable):
@@ -244,7 +254,7 @@ class ScriptString(ScriptVariable):
         super().__init__("str", value)
 
 
-''' TODO: Finish this
+''' TODO: Delete this
 A Collection emulates a class/list/set/etc. It can contain unlimited 
 '''
 class ScriptCollection(ScriptVariable):
@@ -287,56 +297,45 @@ class ScriptEnvironment():
     #Also handles the following builtin functions: cos, sin, tan, arccos,
     #arcsin, arctan, abs, floor, ceil, round
     def getVariableOrConstant(self, var):
-        builtins = {"cos", "sin", "tan", "arccos", "arcsin", "arctan", "abs",
-                    "floor", "ceil", "round"}
-        spl = var.split(':')
-
-        
-        if len(spl) == 1:
-            #Just a single variable or constant to return value of
-            if var.isdigit(): #TODO: support floats
-                return stringToScriptNumber(var)
-            elif var == "True":
-                return ScriptBoolean(True)
-            elif var == "False":
-                return ScriptBoolean(False)
-            elif var in self.externals:
-                return self.externals[var]
-            elif var in self.constants:
-                return self.constants[var]
-            elif var in self.locs:
-                return self.locs[var]
-            else:
-                scriptError(f"Variable {var} is not defined")
-        elif spl[-1] in builtins:
-            target = self.evaluateExpression(":".join(spl[0:-1])).value
-            #Utilizing a buiiltin function
-            if spl[-1] == "cos":
-                return ScriptNumber(math.cos(target))
-            elif spl[-1] == "tan":
-                return ScriptNumber(math.tan(target))
-            elif spl[-1] == "arccos":
-                return ScriptNumber(math.arccos(target))
-            elif spl[-1] == "sin":
-                return ScriptNumber(math.sin(target))
-            elif spl[-1] == "arcsin":
-                return ScriptNumber(math.arcsin(target))
-            elif spl[-1] == "arctan":
-                return ScriptNumber(math.arctan(target))
-            elif spl[-1] == "abs":
-                return ScriptNumber(math.abs(target))
-            elif spl[-1] == "floor":
-                return ScriptNumber(math.floor(target))
-            elif spl[-1] == "ceil":
-                return ScriptNumber(math.ceil(target))
-            elif spl[-1] == "round":
-                return ScriptNumber(math.round(target))
-
+        #Just a single variable or constant to return value of
+        if var.isdigit(): #TODO: support floats
+            return stringToScriptNumber(var)
+        elif var == "True":
+            return ScriptBoolean(True)
+        elif var == "False":
+            return ScriptBoolean(False)
+        elif var in self.externals:
+            return self.externals[var]
+        elif var in self.constants:
+            return self.constants[var]
+        elif var in self.locs:
+            return self.locs[var]
         else:
-            pass
-            #TODO: this
-            #Accessing an element of a ScriptCollection
-        
+            scriptError(f"Variable {var} is not defined")
+            
+    #Set a variable            
+    def setVariable(self, var, value):
+        varTypes = ["num", "str", "bool"]
+        #Case where creating a new variable
+        for varType in varTypes:
+            if var.startswith(varType):
+                varName = var[len(varType):]
+                if (varName in self.locs or varName in self.constants or
+                    varName in self.externals):
+                    scriptError(f"Variable {varName} already exists")
+                    return
+                else:
+                    self.locs[varName] = value
+                    return
+        #Case where assigning a new variable:
+        if var in self.locs:
+            self.locs[var].assign(value)
+        elif var in self.externals:
+            self.externals[var].assign(value)
+        elif var in self.constants:
+            scriptError(f"Cant assign {var} -- is a constant")
+        else:
+            scriptError(f"Cant assign {var} -- doesn't exist")
 
     # Recursively evaluates parsed boolean expressions
     def evaluateBoolExpression(self, tokens, comparators):
@@ -401,6 +400,34 @@ class ScriptEnvironment():
         #Constant/variable
         else:
             return self.getVariableOrConstant(tokens)
+    def evalBuiltin(self, f, rhs):
+        builtins = {"cos", "sin", "tan", "arccos", "arcsin", "arctan", "abs",
+                    "floor", "ceil", "round"}
+        if f not in builtins:
+            scriptError(f"Undefined function: {f}")
+            return
+        elif f == 'cos':
+            return ScriptNumber(math.cos(rhs.value))
+        elif f == 'sin':
+            return ScriptNumber(math.sin(rhs.value))
+        elif f == 'tan':
+            return ScriptNumber(math.tan(rhs.value))
+        elif f == 'arccos':
+            return ScriptNumber(math.arccos(rhs.value))
+        elif f == 'arcsin':
+            return ScriptNumber(math.arcsin(rhs.value))
+        elif f == 'arctan':
+            return ScriptNumber(math.arctan(rhs.value))
+        elif f == 'abs':
+            return ScriptNumber(abs(rhs.value))
+        elif f == 'floor':
+            return ScriptNumber(math.floor(rhs.value))
+        elif f == 'ceil':
+            return ScriptNumber(math.ceil(rhs.value))
+        elif f == 'round':
+            return ScriptNumber(math.round(rhs.value))
+
+        
 
     #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
@@ -410,10 +437,13 @@ class ScriptEnvironment():
         if isinstance(tokens, list) and len(tokens) > 1:
             if len(tokens) >= 3:
                 #print(tokens)
-                lhs = self.evaluateSubExpression(tokens[0])
                 operator = deNest(tokens[1])
                 rhs = self.evaluateSubExpression(tokens[2:])
-                #print(lhs, tokens[0], rhs, tokens[2])
+                #Using a builtin function
+                if operator == ':':
+                    rhs = self.evaluateSubExpression(tokens[2:])
+                    return self.evalBuiltin(deNest(tokens[0]), rhs)
+                lhs = self.evaluateSubExpression(tokens[0])
 
                 if rhs.type != lhs.type:
                     scriptError(f"Cannot use operator {operator} with " +
@@ -460,7 +490,7 @@ class ScriptEnvironment():
         variable, otherwise we recursively evaluate the expression and apply
         the operator
         '''
-        operators = ['+', '-', '/', '*', '%', '**', '//']
+        operators = ['+', '-', '/', '*', '%', '**', '//', ':']
         boolOperators = ['&&', '||', '&!', '|!', '!']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
 
@@ -476,15 +506,34 @@ class ScriptEnvironment():
             if len(parsed) == 1: #TODO: i think this and corresponding in bool expression can be removed
                 return self.getVariableOrConstant(parsed[0])
             return self.evaluateSubExpression(parsed)
-        
-    def executeStep(self):
-        instrIndex = 0
+    def executeNext(self):
         pass
+    def executeStep(self, step, verbose=False):
+        step = removeWhiteSpace(step)
+        comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' 
+        #variable assignment
+        assignmentSplit = splitStrByGroup(step, comparators + ["="])
+        if '=' in assignmentSplit:
+            if assignmentSplit[1] != '=' or assignmentSplit.count("=") >1:
+                scriptError("Improper assignment")
+                return
+            else:
+                opInd = step.find('=')
+                if opInd == -1:
+                    scriptError("Improper assignment")
+                    return
+                var = step[0:opInd]
+                rhs = self.evaluateExpression(step[opInd+1:])
+                self.setVariable(var, rhs)
+                if verbose: scriptLog(rhs.value)
+        #None of the above, just expression, print for debugging purposes
+        elif verbose:
+            scriptLog(self.evaluateExpression(step).value)
 
 def repl(env):
     inp = input("S>> ")
     while inp != "exit":
-        print(env.evaluateExpression(inp).value)
+        env.executeStep(inp, verbose=True)
         inp = input("S>> ")
 
 if __name__ == "__main__":
