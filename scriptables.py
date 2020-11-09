@@ -45,7 +45,7 @@ def removeWhiteSpace(s):
             clean += c
     return clean
 
-#Returns true if expression is a comparison, false otherwise
+#Returns true if expression is a boolean expression, false otherwise
 def isBoolExpression(expression, comparators, boolOps):
     for comp in comparators:
         if comp in expression:
@@ -515,6 +515,7 @@ class ScriptEnvironment():
         comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' or '>=' etc.
         #variable assignment
         assignmentSplit = splitStrByGroup(step, comparators + ["="])
+        #Line is assigning a variable
         if '=' in assignmentSplit:
             if assignmentSplit[1] != '=' or assignmentSplit.count("=") >1:
                 scriptError("Improper assignment")
@@ -528,21 +529,37 @@ class ScriptEnvironment():
                 rhs = self.evaluateExpression(step[opInd+1:])
                 self.setVariable(var, rhs)
                 if verbose: scriptLog(rhs.value)
-        if step[0:4] == "log:":
+        #Line is printing to log
+        elif step[0:4] == "log:":
             scriptLog(self.evaluateExpression(step[4:]).value)
+        #Line is beggining of if statement
+        #Line is beggining of while loop
+        #Line is end of while loop
         #None of the above, just expression, print for debugging purposes
-        elif verbose:
+        elif verbose and step != "":
             scriptLog(self.evaluateExpression(step).value)
 
-def repl(env):
-    inp = input("S>> ")
-    while inp != "exit":
-        env.executeStep(inp, verbose=True)
-        inp = input("S>> ")
 
+####### Everything below here is for debugging ###############
 if __name__ == "__main__":
-    #Setup a script environment for debugging purposes
-    locs = {'t':ScriptBoolean(True), 'f':ScriptBoolean(False)}
+    #Override the scriptLog function to print to command line
+    def scriptLog(msg):
+        print(msg)
+
+    #Basic repl for testing
+    def repl(env):
+        inp = ""
+        while inp != "exit":
+            inp = input("S>> ")
+            if inp != "exit":
+                try:
+                    env.executeStep(inp, verbose=True)
+                except ScriptError:
+                    pass
+                except Exception:
+                    print("Unknown Error")
+                    
+    
+    #Setup an empty script environment and start repl
     env = ScriptEnvironment()
-    env.locs = locs
     repl(env)
