@@ -197,14 +197,13 @@ def bangPreprocessor(tokens):
             i+=1
     #Parsing things with '!' can create a few artifacts that we need to remove
     if isinstance(new[0], list) and first != 0:
-        print(new)
         new = new[0] + new[1:]
-        print(new)
     i = 0
     while i < len(new):
         if new[i] == []:
             new.pop(i)
-        i += 1
+        else:
+            i += 1
 
     return new
 
@@ -219,7 +218,7 @@ class ScriptVariable():
         self.value = value
     def assign(self, var):
         if not var.type == self.type:
-            scriptErorr(f"Assignment is not of type {self.type}")
+            scriptError(f"Assignment is not of type {self.type}")
             return
         else:
             self.value = var.value
@@ -243,7 +242,7 @@ class ScriptNumber(ScriptVariable):
 
     def assign(self, var):
         if not var.type == self.type:
-            scriptErorr(f"Assignment is not of type {self.type}")
+            scriptError(f"Assignment is not of type {self.type}")
             return
         val = var.value
         if abs(val - round(val)) < SCRIPT_CONFIG["NUM_INT_TOLERANCE"]:
@@ -325,6 +324,9 @@ class ScriptEnvironment():
                 if (varName in self.locs or varName in self.constants or
                     varName in self.externals):
                     scriptError(f"Variable {varName} already exists")
+                    return
+                elif value.type != varType:
+                    scriptError(f"Assignment is not of type {varType}")
                     return
                 else:
                     self.locs[varName] = value
@@ -510,7 +512,7 @@ class ScriptEnvironment():
         pass
     def executeStep(self, step, verbose=False):
         step = removeWhiteSpace(step)
-        comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' 
+        comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' or '>=' etc.
         #variable assignment
         assignmentSplit = splitStrByGroup(step, comparators + ["="])
         if '=' in assignmentSplit:
@@ -526,6 +528,8 @@ class ScriptEnvironment():
                 rhs = self.evaluateExpression(step[opInd+1:])
                 self.setVariable(var, rhs)
                 if verbose: scriptLog(rhs.value)
+        if step[0:4] == "log:":
+            scriptLog(self.evaluateExpression(step[4:]).value)
         #None of the above, just expression, print for debugging purposes
         elif verbose:
             scriptLog(self.evaluateExpression(step).value)
