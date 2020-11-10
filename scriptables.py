@@ -111,6 +111,32 @@ def scanParenIndices(expression):
                 depth -= 1
     scriptError("Unmatched parentheses")
 
+#generalization of scanParenIndices for line prefixes
+#Returns index of closing prefex that corresponds to opening prefix
+#at given infex
+def scanPrefixIndex(lines, index, startPrefix, endPrefix, reverse = False):
+    l = None  
+    if reverse:
+        l = len(lines)
+        index = l - index
+        lines = reversed(lines)
+        startPrefix, endPrefix = endPrefix, startPrefix
+    if not lines[index].startswith(startPrefix):
+        scriptError("This really shouldn't happen")
+        return
+    depth = 0
+    for i in range(index+1, len(lines)):
+        if lines[i].startswith(startPrefix):
+            depth +=1
+        elif lines[i].startswith(endPrefix):
+            if depth == 0:
+                return i if not reverse else l-i
+            else:
+                depth -= 1
+    scriptError(f"Bad syntax: {startPrefix} on line {index} does note have"+
+                f" a matching {endPrefix}")
+
+#Now entering the recursion zone😈...
 # recursively breaks an expression into a list of strings split by parentheses
 def splitParens(expression):
     spl = []
@@ -282,7 +308,7 @@ def stringToScriptNumber(s):
 
 #Environment for script to run in
 class ScriptEnvironment():
-    def __init__(self, constants = dict(), externals = dict()):
+    def __init__(self, script = "", constants = dict(), externals = dict()):
         # Constants - cannot be changed within scripts
         # Externals - can be changed within scripts, returned by executeStep()
         # Externals are used as the way to get output from the script
@@ -290,6 +316,13 @@ class ScriptEnvironment():
         self.constants = constants
         self.externals = externals
         self.instructionIndex = 0
+        self.lines = []
+        if script:
+            for line in script.split('\n'):
+                line = removeWhiteSpace(line)
+                if line !="":
+                    self.lines.append(line)
+        
 
     def loadScript(self, script):
         pass
@@ -402,6 +435,8 @@ class ScriptEnvironment():
         #Constant/variable
         else:
             return self.getVariableOrConstant(tokens)
+    
+    #Evaluate a builtin function f on ScriptNumber rhs
     def evalBuiltin(self, f, rhs):
         builtins = {"cos", "sin", "tan", "arccos", "arcsin", "arctan", "abs",
                     "floor", "ceil", "round"}
@@ -508,9 +543,24 @@ class ScriptEnvironment():
             if len(parsed) == 1: #TODO: i think this and corresponding in bool expression can be removed
                 return self.getVariableOrConstant(parsed[0])
             return self.evaluateSubExpression(parsed)
+    
+    def executeAll(self):
+        while self.executeNext() != 0: pass
+        self.instructionIndex = 0
+        return self.locs, self.externals
+    #Execute the next line
     def executeNext(self):
-        pass
-    def executeStep(self, step, verbose=False):
+        self.instructionIndex = self.executeStep(self.lines[self.instructionIndex],
+                                self.instructionIndex)
+        #print(self.instructionIndex)
+        #input()
+        if self.instructionIndex >= len(self.lines):
+            return 0
+        else:
+            return self.locs, self.externals
+
+    #Execute a given line, return the new instructionIndex
+    def executeStep(self, step, opIndex, verbose=False):
         step = removeWhiteSpace(step)
         comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' or '>=' etc.
         #variable assignment
@@ -533,14 +583,22 @@ class ScriptEnvironment():
         elif step[0:4] == "log:":
             scriptLog(self.evaluateExpression(step[4:]).value)
         #Line is beggining of if statement
+        elif step[0:2] == "if":
+            if not self.evaluateExpression(step[2:]).value:
+                endIfIndex = scanPrefixIndex(self.lines, opIndex, 'if', 'endif')
+                return endIfIndex
+            return opIndex + 1
         #Line is beggining of while loop
         #Line is end of while loop
         #None of the above, just expression, print for debugging purposes
         elif verbose and step != "":
             scriptLog(self.evaluateExpression(step).value)
 
+        return opIndex + 1
 
-####### Everything below here is for debugging ###############
+
+#################### Everything below here is for debugging ####################
+
 if __name__ == "__main__":
     #Override the scriptLog function to print to command line
     def scriptLog(msg):
@@ -553,13 +611,12 @@ if __name__ == "__main__":
             inp = input("S>> ")
             if inp != "exit":
                 try:
-                    env.executeStep(inp, verbose=True)
+                    env.executeStep(inp, opIndex, verbose=True)
                 except ScriptError:
                     pass
                 except Exception:
                     print("Unknown Error")
                     
-    
     #Setup an empty script environment and start repl
     env = ScriptEnvironment()
     repl(env)
