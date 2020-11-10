@@ -545,19 +545,23 @@ class ScriptEnvironment():
             return self.evaluateSubExpression(parsed)
     
     def executeAll(self):
-        while self.executeNext() != 0: pass
+        while self.executeNext(): pass
         self.instructionIndex = 0
         return self.locs, self.externals
     #Execute the next line
     def executeNext(self):
-        self.instructionIndex = self.executeStep(self.lines[self.instructionIndex],
-                                self.instructionIndex)
-        #print(self.instructionIndex)
-        #input()
-        if self.instructionIndex >= len(self.lines):
-            return 0
-        else:
-            return self.locs, self.externals
+        try:
+            self.instructionIndex = self.executeStep(self.lines[self.instructionIndex],
+                                    self.instructionIndex)
+            #print(self.instructionIndex)
+            #input()
+            if self.instructionIndex >= len(self.lines):
+                return 0
+            else:
+                return self.locs, self.externals
+        except ScriptError:
+            scriptError(f"Error on {self.instructionIndex}:{self.lines[self.instructionIndex]}")
+            return
 
     #Execute a given line, return the new instructionIndex
     def executeStep(self, step, opIndex, verbose=False):
