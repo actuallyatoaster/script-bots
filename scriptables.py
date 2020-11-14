@@ -481,7 +481,6 @@ class ScriptEnvironment():
     #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
         tokens = deNest(tokens)
-
         #Type 1
         if isinstance(tokens, list) and len(tokens) > 1:
             if len(tokens) >= 3:
@@ -517,7 +516,10 @@ class ScriptEnvironment():
                     return ScriptNumber(lhs.value// rhs.value)
                 elif operator == '%':
                     return ScriptNumber(lhs.value % rhs.value)
-                
+            #Case for negative numbers
+            elif len(tokens) == 2 and deNest(tokens[0]) == "-":
+                rhs = self.evaluateSubExpression(tokens[1:])
+                return ScriptNumber(-(rhs.value))
             else: 
                 scriptError("Improper expression")
                 return

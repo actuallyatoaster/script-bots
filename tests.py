@@ -19,7 +19,8 @@ def testAll(tests):
     testExpressions = [
         ("((1+5)**2)+((1+5)**2)",72),
         ("(True && False) || !True", False),
-        ("(3+1)/2", 2)
+        ("(3+1)/2", 2),
+        ("-(3+1)", -4)
     ]
     print("Testing sample scripts... ", end="")
 
@@ -65,6 +66,9 @@ if __name__ == "__main__":
     if 1 == 1
         if 1 < 2
             out = 0
+        endif
+        if 2<1
+            out=-1
         endif
     endif
 
