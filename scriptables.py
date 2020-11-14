@@ -160,14 +160,31 @@ def splitParens(expression):
     return spl
 
 #recursively parse sub-expressions
+# def parseSubExpr(subExpr, group):
+#     if not isinstance(subExpr, list):
+#         return splitStrByGroup(subExpr, group)
+#     else:
+#         subExprList = []
+#         for subSubExpr in subExpr:
+#             subExprList.append(parseSubExpr(subSubExpr, group))
+#         return subExprList
+
 def parseSubExpr(subExpr, group):
     if not isinstance(subExpr, list):
         return splitStrByGroup(subExpr, group)
     else:
         subExprList = []
         for subSubExpr in subExpr:
-            subExprList.append(parseSubExpr(subSubExpr, group))
+            parsedSub = parseSubExpr(subSubExpr, group)
+            #Case where first or last is an operator
+            if isinstance(parsedSub, list) and (parsedSub[0] in group or 
+                                                parsedSub[-1] in group):
+                subExprList.extend(parsedSub)
+            #otherwise
+            else:
+                subExprList.append(parsedSub)
         return subExprList
+
 
 #Parse an expression in string form, return parsed expression
 def parseExpression(expression, group):
@@ -186,12 +203,12 @@ def parseExpression(expression, group):
                 spl.insert(i+1, parsedSub[-1])
                 i += 2
             #Case where first character is an operators
-            elif parsedSub[0] in group and parsedSub[1] not in group:
+            elif parsedSub[0] in group and parsedSub[-1] not in group:
                 spl[i] = parsedSub[0]
                 spl.insert(i+1, parsedSub[1:])
                 i += 2
             #Case where first and last characters are both operators
-            elif parsedSub[0] in group and parsedSub[1] in group:
+            elif parsedSub[0] in group and parsedSub[-1] in group:
                 spl[i] = parsedSub[0]
                 spl.insert(i+1, parsedSub[1:-1])
                 spl.insert(i+2, parsedSub[-1])
@@ -377,7 +394,6 @@ class ScriptEnvironment():
     # Recursively evaluates parsed boolean expressions
     def evaluateBoolExpression(self, tokens, comparators):
         tokens  = deNest(tokens)
-        #print(tokens)
         #Special case for ! operator
         if len(tokens) == 2:
             if deNest(tokens[0]) != "!":
@@ -404,7 +420,6 @@ class ScriptEnvironment():
                 lhs = self.evaluateSubExpression(tokens[0:compIndex])
                 comparator = deNest(tokens[compIndex])
                 rhs = self.evaluateSubExpression(tokens[compIndex+1:])
-                #print(tokens[0],"----", tokens[1])
                 if comparator == '<':
                     return ScriptBoolean(lhs.value < rhs.value)
                 elif comparator == '>':
@@ -423,7 +438,6 @@ class ScriptEnvironment():
                 lhs = self.evaluateBoolExpression(tokens[0], comparators)
                 operator = deNest(tokens[1])
                 rhs = self.evaluateBoolExpression(tokens[2:], comparators)
-                #print(tokens[0], lhs.value, operator, tokens[2:], rhs.value)
                 if operator  == '&&':
                     return ScriptBoolean(lhs.value and rhs.value)
                 elif operator  == '||':
@@ -464,8 +478,6 @@ class ScriptEnvironment():
         elif f == 'round':
             return ScriptNumber(math.round(rhs.value))
 
-        
-
     #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
         tokens = deNest(tokens)
@@ -473,7 +485,6 @@ class ScriptEnvironment():
         #Type 1
         if isinstance(tokens, list) and len(tokens) > 1:
             if len(tokens) >= 3:
-                #print(tokens)
                 operator = deNest(tokens[1])
                 rhs = self.evaluateSubExpression(tokens[2:])
                 #Using a builtin function
@@ -553,7 +564,6 @@ class ScriptEnvironment():
         try:
             self.instructionIndex = self.executeStep(self.lines[self.instructionIndex],
                                     self.instructionIndex)
-            #print(self.instructionIndex)
             #input()
             if self.instructionIndex >= len(self.lines):
                 return 0
@@ -614,13 +624,17 @@ if __name__ == "__main__":
         while inp != "exit":
             inp = input("S>> ")
             if inp != "exit":
-                try:
-                    env.executeStep(inp, opIndex, verbose=True)
-                except ScriptError:
-                    pass
-                except Exception:
-                    print("Unknown Error")
-                    
+                env.executeStep(inp, 0, verbose=True)
+                # try:
+                #     env.executeStep(inp, 0, verbose=True)
+                # except ScriptError:
+                #     pass
+                # except Exception as err:
+                #     print(f"Unknown Error: {err}")
+    #Setup some helpful variables for debugging
+    operators = ['+', '-', '/', '*', '%', '**', '//', ':']
+    boolOperators = ['&&', '||', '&!', '|!', '!']
+    comparators = ['<', '>', '<=', '>=', '==', '!=']        
     #Setup an empty script environment and start repl
     env = ScriptEnvironment()
     repl(env)

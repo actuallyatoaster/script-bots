@@ -15,10 +15,24 @@ def varsMatch(vars1, vars2):
     return True
 
 def testAll(tests):
-    print("Testing sample scripts...", end="")
+    #A few expressions that have caused bugs in the past
+    testExpressions = [
+        ("((1+5)**2)+((1+5)**2)",72),
+        ("(True && False) || !True", False),
+        ("(3+1)/2", 2)
+    ]
+    print("Testing sample scripts... ", end="")
+
+    #test full scripts
     for test in tests:
         locs, ext = test.env.executeAll()
         assert(varsMatch(test.expected, ext))
+
+    #test expressions
+    env = ScriptEnvironment()
+    for expr, result in testExpressions:
+        assert(env.evaluateExpression(expr).value == result)
+
     print("Passed!")
 
 if __name__ == "__main__":
