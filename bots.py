@@ -18,6 +18,13 @@ def getEquipmentExternals(equipment):
             externals[external] = item.externals[external]
     return externals
 
+def cleanseLocals(locs):
+    newLocs = dict()
+    for var in locs:
+        if var[0] == '$':
+            newLocs[var] = locs[var]
+    return newLocs
+
 class Bot():
 
     def __init__(self, equipment, script, collisionRadius, position, health, speed):
@@ -36,6 +43,8 @@ class Bot():
         self.env.externals = getEquipmentExternals(self.equipment)
         self.env.externals["xMov"] = scriptables.ScriptNumber(0)
         self.env.externals["yMov"] = scriptables.ScriptNumber(0)
+
+        self.env.constants["firstCall"] = scriptables.ScriptBoolean(True)
     
     def updateScriptConstants(self):
         self.env.constants["botX"] = scriptables.ScriptNumber(self.pos[0])
@@ -46,10 +55,11 @@ class Bot():
         
         if time.time() >= self.lastScriptUpdate + SCRIPT_UPDATE_SPEED:
             #Inject new variables into script environment
-            self.env.locs = dict()
+            self.env.locs = cleanseLocals(self.env.locs)
             self.updateScriptConstants()
             self.env.executeAll()
             self.lastScriptUpdate = time.time()
+            self.env.constants["firstCall"] = scriptables.ScriptBoolean(False)
 
         #Update weapons
         for eq in self.equipment:

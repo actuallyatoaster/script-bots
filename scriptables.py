@@ -372,8 +372,8 @@ class ScriptEnvironment():
         for varType in varTypes:
             if var.startswith(varType):
                 varName = var[len(varType):]
-                if (varName in self.locs or varName in self.constants or
-                    varName in self.externals):
+                if ((varName in self.locs or varName in self.constants or
+                    varName in self.externals)):
                     scriptError(f"Variable {varName} already exists")
                     return
                 elif value.type != varType:

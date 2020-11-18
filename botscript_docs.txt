@@ -3,5 +3,12 @@ botX, botY
 builtins
 random
 
+firstCall
+
 extnerals persist
 locals don't
+
+persistent local: $: $ at the start of variable name will designate a
+persistent local variable. If you declare a persistent local variable outside
+of a "if firstCall" conditional, you will get an error as you will be declaring
+the variable every update even though it alreay exists.
