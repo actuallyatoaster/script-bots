@@ -338,6 +338,8 @@ class ScriptEnvironment():
         if script:
             for line in script.split('\n'):
                 line = removeWhiteSpace(line)
+                if '#' in line:
+                    line = line[:line.find('#')]
                 if line !="":
                     self.lines.append(line)
         
@@ -477,7 +479,7 @@ class ScriptEnvironment():
         elif f == 'ceil':
             return ScriptNumber(math.ceil(rhs.value))
         elif f == 'round':
-            return ScriptNumber(math.round(rhs.value))
+            return ScriptNumber(round(rhs.value))
 
     #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
@@ -591,6 +593,7 @@ class ScriptEnvironment():
     def executeStep(self, step, opIndex, verbose=False):
         step = removeWhiteSpace(step)
         comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' or '>=' etc.
+        
         #variable assignment
         assignmentSplit = splitStrByGroup(step, comparators + ["="])
         #Line is assigning a variable
