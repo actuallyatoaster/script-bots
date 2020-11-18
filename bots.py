@@ -9,14 +9,20 @@ purpose
 def pointDistance(x0, y0, x1, y1):
     return (((x0-x1)**2)+((y0-y1)**2))**(1/2)
 
-def getEquipmentExternals(eq):
-    pass
+def getEquipmentExternals(equipment):
+    externals = dict()
+    for item in equipment:
+        for external in item.externals:
+            externals[external] = item.externals[external]
+    return externals
 
 class Bot():
 
     def __init__(self, equipment, script, collisionRadius, position, health):
         self.equipment = equipment
-        self.externals = getEquipmentExternals(equipment)
+        for eq in self.equipment:
+            eq.bot = self
+
         self.env = scriptables.ScriptEnvironment(script)
         self.pos = position
         self.health = health
@@ -27,11 +33,13 @@ class Bot():
 
     def update(self, app, enemyBots, lines):
         self.updateScriptConstants()
-        #Do script stuff
-        #...
+        externals = getEquipmentExternals(self.equipment)
+        #Inject new variables into script environment
+        self.env.externals = externals
+        locs, externals = self.env.executeAll()
         for eq in self.equipment:
-            self.externals = {"direction":0, "fire":True}
-            eq.update(self.externals)
+            #self.externals = {"direction":0, "fire":True}
+            eq.update(externals)
             for projectile in eq.projectiles:
                 projectile.update(app, enemyBots)
 
@@ -91,24 +99,26 @@ class Projectile():
         
 
 class Equipment():
-    def __init__(self, bot, projectileSpeed, fireRate, projectileTexture, damage, projectileColRad):
+    def __init__(self, name, projectileSpeed, fireRate, projectileTexture, damage, projectileColRad):
+        self.name = name
         self.projectileSpeed = projectileSpeed
         self.projectileColRad = projectileColRad
         self.fireCooldown = 1/fireRate
         self.projectileTexture = projectileTexture
         self.projectiles = []
-        self.externals = {"direction":0, "fire": False}
+        self.externals = {self.name+"Direction": scriptables.ScriptNumber(0),
+                         self.name+"Fire": scriptables.ScriptBoolean(False)}
         self.lastFire = 0
-        self.bot=bot
+        self.bot = None
         self.damage=damage
     
     def update(self, externals):
-        if externals["fire"]:
+        if externals[self.name+"Fire"].value:
             if time.time() - self.lastFire >= self.fireCooldown:
                 self.lastFire = time.time()
                 #Create a new projectile
                 newProjectile = Projectile(self, self.projectileSpeed, 
-                    self.projectileTexture, self.bot.pos, externals["direction"],
+                    self.projectileTexture, self.bot.pos, externals[self.name+"Direction"].value,
                     self.projectileColRad, self.damage)
                 self.projectiles.append(newProjectile)
 

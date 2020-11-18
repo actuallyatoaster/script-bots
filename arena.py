@@ -32,9 +32,13 @@ class Arena():
 def appStarted(app):
     app.arena = Arena()
     app.arenaWidth = app.arenaHeight = 500
+    script = '''
+    gunFire = True
+    gunDirection = gunDirection + 1
+    '''
+    gun = bots.Equipment("gun", 10, 100, None, 3, 2)
+    bot = bots.Bot([gun], script, 5, (250,250), 10)
     
-    bot = bots.Bot([], "", 5, (250,250), 10)
-    gun = bots.Equipment(bot, 10, 2, None, 3, 2)
     bot.equipment.append(gun)
 
     app.arena.friendlyBots.append(bot)
