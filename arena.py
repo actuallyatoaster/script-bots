@@ -37,13 +37,20 @@ def appStarted(app):
     gunDirection = gunDirection + 1
     if firstCall
         xMov = 1
+        yMov = 1
         num $count = 0
     endif
-    if botX > 400
+    if bot.x > 400
         xMov = 0-1
     endif
-    if botX < 100
+    if bot.x < 100
         xMov = 1
+    endif
+    if bot.y>400
+        yMov = 0-1
+    endif
+    if bot.y < 100
+        yMov = 1
     endif
     $count = $count + 1
     log:$count

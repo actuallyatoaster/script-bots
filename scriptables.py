@@ -580,7 +580,7 @@ class ScriptEnvironment():
                                     self.instructionIndex)
             #input()
             if self.instructionIndex >= len(self.lines):
-                return 0
+                return None
             else:
                 return self.locs, self.externals
         except ScriptError:
@@ -614,8 +614,19 @@ class ScriptEnvironment():
         elif step[0:2] == "if":
             if not self.evaluateExpression(step[2:]).value:
                 endIfIndex = scanPrefixIndex(self.lines, opIndex, 'if', 'endif')
-                return endIfIndex
+                #print(self.lines[endIfIndex])
+                if self.lines[endIfIndex+1] == 'else':
+                    return endIfIndex + 2
+                else:
+                    return endIfIndex
             return opIndex + 1
+        elif step[0:5] == "else": #only actually reached when the if statement evals to true
+            if self.lines[opIndex-1][:5] != "endif":
+                scriptError("'else' does not follow endif")
+                return
+            else:
+                endElse = scanPrefixIndex(self.lines, opIndex, 'else', 'endelse')
+                return endElse
         #Line is beggining of while loop
         #Line is end of while loop
         #None of the above, just expression, print for debugging purposes

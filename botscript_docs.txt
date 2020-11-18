@@ -1,3 +1,5 @@
+basic syntax, if/else
+
 xMov, yMov
 botX, botY
 builtins

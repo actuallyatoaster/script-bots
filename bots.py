@@ -47,8 +47,8 @@ class Bot():
         self.env.constants["firstCall"] = scriptables.ScriptBoolean(True)
     
     def updateScriptConstants(self):
-        self.env.constants["botX"] = scriptables.ScriptNumber(self.pos[0])
-        self.env.constants["botY"] = scriptables.ScriptNumber(self.pos[1])
+        self.env.constants["bot.x"] = scriptables.ScriptNumber(self.pos[0])
+        self.env.constants["bot.y"] = scriptables.ScriptNumber(self.pos[1])
 
 
     def update(self, app, enemyBots, lines):

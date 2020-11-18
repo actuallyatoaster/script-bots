@@ -27,6 +27,8 @@ def testAll(tests):
     #test full scripts
     for test in tests:
         locs, ext = test.env.executeAll()
+        # for e in ext:
+        #     print(f"{e}: {ext[e].value}")
         assert(varsMatch(test.expected, ext))
 
     #test expressions
@@ -110,7 +112,46 @@ if __name__ == "__main__":
     ''' 
     out = {"out":ScriptNumber(35), "b":ScriptBoolean(True), "a":ScriptNumber(10)}
     tests.append(Test(testStr, const, ext, out))
+    ############ Else statements
+    const = dict()
+    ext = {"out":ScriptNumber(30), "b":ScriptBoolean(False), "a":ScriptNumber(42)}
+    testStr = '''
+    if b
+        out=0
+    endif
+    else
+        out=1
+        if b
+            a = 0
+        endif
+        else
+            a=50
+        endelse
+    endelse
+
+    ''' 
+    out = {"out":ScriptNumber(1), "b":ScriptBoolean(False), "a":ScriptNumber(50)}
+    tests.append(Test(testStr, const, ext, out))
+    ############ Else statements
+    const = dict()
+    ext = {"out":ScriptNumber(30), "b":ScriptBoolean(False), "a":ScriptNumber(42)}
+    testStr = '''
+    if b
+        out=0
+    endif
+    else
+        out=1
+        if !b
+            a = 0
+        endif
+        else
+            a=50
+        endelse
+    endelse
+
+    ''' 
+    out = {"out":ScriptNumber(1), "b":ScriptBoolean(False), "a":ScriptNumber(0)}
+    tests.append(Test(testStr, const, ext, out))
 
 
     testAll(tests)
-    env = tests[-1].env
