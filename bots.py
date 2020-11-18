@@ -6,7 +6,7 @@ This file contains classes defining bots, equipment for bots, projectiles, and
 their associated behaviours. It also includes some helper functions for this
 purpose
 '''
-SCRIPT_UPDATE_SPEED = 0.2
+SCRIPT_UPDATE_SPEED = 0.05
 
 def pointDistance(x0, y0, x1, y1):
     return (((x0-x1)**2)+((y0-y1)**2))**(1/2)
@@ -36,30 +36,33 @@ class Bot():
         self.pos = position
         self.health = health
         self.collisionRadius = collisionRadius
-        self.lastScriptUpdate = 0
+        self.lastScriptUpdate = time.time()
         self.speed = speed
-
+        #deltaTime for updates
+        self.lastTime = time.time()
         #Set up environment externals
         self.env.externals = getEquipmentExternals(self.equipment)
         self.env.externals["xMov"] = scriptables.ScriptNumber(0)
         self.env.externals["yMov"] = scriptables.ScriptNumber(0)
 
-        self.env.constants["firstCall"] = scriptables.ScriptBoolean(True)
+        self.env.constants["FIRST_CALL"] = scriptables.ScriptBoolean(True)
+        self.env.constants["pi"] = scriptables.ScriptNumber(math.pi)
     
     def updateScriptConstants(self):
         self.env.constants["bot.x"] = scriptables.ScriptNumber(self.pos[0])
         self.env.constants["bot.y"] = scriptables.ScriptNumber(self.pos[1])
+        self.env.constants["D_TIME"] = scriptables.ScriptNumber(time.time() - self.lastScriptUpdate)
 
 
     def update(self, app, enemyBots, lines):
-        
+        dTime = time.time() - self.lastTime
         if time.time() >= self.lastScriptUpdate + SCRIPT_UPDATE_SPEED:
             #Inject new variables into script environment
             self.env.locs = cleanseLocals(self.env.locs)
             self.updateScriptConstants()
             self.env.executeAll()
             self.lastScriptUpdate = time.time()
-            self.env.constants["firstCall"] = scriptables.ScriptBoolean(False)
+            self.env.constants["FIRST_CALL"] = scriptables.ScriptBoolean(False) 
 
         #Update weapons
         for eq in self.equipment:
@@ -72,9 +75,9 @@ class Bot():
         xVel, yVel = self.env.externals["xMov"].value, self.env.externals["yMov"].value
         if abs(xVel) > 1: xVel = xVel/abs(xVel)
         if abs(yVel) > 1: yVel = yVel/abs(xVel)
-        self.pos = (self.pos[0] + self.speed*xVel,
-                    self.pos[1] + self.speed*yVel)
-
+        self.pos = (self.pos[0] + self.speed*xVel*dTime,
+                    self.pos[1] + self.speed*yVel*dTime)
+        self.lastTime = time.time()
     def draw(self, app, canvas):
         canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
@@ -94,11 +97,13 @@ class Projectile():
         self.direction = direction
         self.collisionRadius = collisionRadius
         self.damage = damage
+        self.lastTime = time.time()
     
     #Move the projectile and deal damage if needed
     def update(self, app, bots):
-        xVel = self.speed * math.cos(self.direction)
-        yVel = -1 * self.speed * math.sin(self.direction)
+        dTime = time.time() - self.lastTime
+        xVel = self.speed * math.cos(self.direction) * dTime
+        yVel = -1 * self.speed * math.sin(self.direction) * dTime
         self.pos = (self.pos[0] + xVel, self.pos[1] + yVel)
 
         #Outside arena
@@ -112,7 +117,8 @@ class Projectile():
         if collision != None:
             collision.damage(self.damage)
             self.origin.projectiles.remove(self)
-    
+
+        self.lastTime = time.time()
     #Check if projectile is colliding with a bot in bots
     #If it is, return the bot. Otherwise, return None
     def checkCollisions(self, bots):

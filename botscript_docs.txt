@@ -5,6 +5,10 @@ botX, botY
 builtins
 random
 
+D_TIME
+FIRST_CALL
+pi
+
 firstCall
 
 extnerals persist

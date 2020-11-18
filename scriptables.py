@@ -12,7 +12,7 @@ import math
 #Some configuration for the script environment
 #TODO: move this to a config file
 SCRIPT_CONFIG = {
-    "NUM_INT_TOLERANCE": 10**(-4),# tolerance for floats to be converted to ints
+    "NUM_INT_TOLERANCE": 10**(-6),# tolerance for floats to be converted to ints
 }
 
 #Error type used for errors within scripts
