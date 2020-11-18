@@ -1,0 +1,7 @@
+xMov, yMov
+botX, botY
+builtins
+random
+
+extnerals persist
+locals don't

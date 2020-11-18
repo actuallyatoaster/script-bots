@@ -35,9 +35,19 @@ def appStarted(app):
     script = '''
     gunFire = True
     gunDirection = gunDirection + 1
+    num a = 0
+    if xMov == 0
+        xMov = 1
+    endif
+    if botX > 400
+        xMov = 0-1
+    endif
+    if botX < 100
+        xMov = 1
+    endif
     '''
     gun = bots.Equipment("gun", 10, 100, None, 3, 2)
-    bot = bots.Bot([gun], script, 5, (250,250), 10)
+    bot = bots.Bot([gun], script, 5, (250,250), 10, 10)
     
     bot.equipment.append(gun)
 

@@ -334,6 +334,7 @@ class ScriptEnvironment():
         self.externals = externals
         self.instructionIndex = 0
         self.lines = []
+        self.parseCache = dict()
         if script:
             for line in script.split('\n'):
                 line = removeWhiteSpace(line)
@@ -546,13 +547,24 @@ class ScriptEnvironment():
 
         if isBoolExpression(expression, comparators, boolOperators):
             #Evaluate as a boolean expression
-            parsed = deNest(parseExpression(expression, comparators + boolOperators + operators))
+            parsed = []
+            if expression in self.parseCache:
+                parsed = self.parseCache[expression]
+            else:
+                parsed = deNest(parseExpression(expression, comparators + boolOperators + operators))
+                self.parseCache[expression] = parsed
+
             if len(parsed) == 1:
                 return self.getVariableOrConstant(parsed[0])
             return self.evaluateBoolExpression(parsed, comparators)
         else:
-            #Evaluate as a numerical expression
-            parsed = deNest(parseExpression(expression, operators))
+            #Evaluate as a numerical expressionparsed = []
+            if expression in self.parseCache:
+                parsed = self.parseCache[expression]
+            else:
+                parsed = deNest(parseExpression(expression, operators))
+                self.parseCache[expression] = parsed
+            
             if len(parsed) == 1: #TODO: i think this and corresponding in bool expression can be removed
                 return self.getVariableOrConstant(parsed[0])
             return self.evaluateSubExpression(parsed)

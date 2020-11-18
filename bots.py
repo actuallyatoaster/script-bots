@@ -6,6 +6,8 @@ This file contains classes defining bots, equipment for bots, projectiles, and
 their associated behaviours. It also includes some helper functions for this
 purpose
 '''
+SCRIPT_UPDATE_SPEED = 0.2
+
 def pointDistance(x0, y0, x1, y1):
     return (((x0-x1)**2)+((y0-y1)**2))**(1/2)
 
@@ -18,7 +20,7 @@ def getEquipmentExternals(equipment):
 
 class Bot():
 
-    def __init__(self, equipment, script, collisionRadius, position, health):
+    def __init__(self, equipment, script, collisionRadius, position, health, speed):
         self.equipment = equipment
         for eq in self.equipment:
             eq.bot = self
@@ -27,22 +29,41 @@ class Bot():
         self.pos = position
         self.health = health
         self.collisionRadius = collisionRadius
+        self.lastScriptUpdate = 0
+        self.speed = speed
+
+        #Set up environment externals
+        self.env.externals = getEquipmentExternals(self.equipment)
+        self.env.externals["xMov"] = scriptables.ScriptNumber(0)
+        self.env.externals["yMov"] = scriptables.ScriptNumber(0)
     
     def updateScriptConstants(self):
-        pass
+        self.env.constants["botX"] = scriptables.ScriptNumber(self.pos[0])
+        self.env.constants["botY"] = scriptables.ScriptNumber(self.pos[1])
+
 
     def update(self, app, enemyBots, lines):
-        self.updateScriptConstants()
-        externals = getEquipmentExternals(self.equipment)
-        #Inject new variables into script environment
-        self.env.externals = externals
-        locs, externals = self.env.executeAll()
+        
+        if time.time() >= self.lastScriptUpdate + SCRIPT_UPDATE_SPEED:
+            #Inject new variables into script environment
+            self.env.locs = dict()
+            self.updateScriptConstants()
+            self.env.executeAll()
+            self.lastScriptUpdate = time.time()
+
+        #Update weapons
         for eq in self.equipment:
             #self.externals = {"direction":0, "fire":True}
-            eq.update(externals)
+            eq.update(self.env.externals)
             for projectile in eq.projectiles:
                 projectile.update(app, enemyBots)
 
+        #Update movement
+        xVel, yVel = self.env.externals["xMov"].value, self.env.externals["yMov"].value
+        if abs(xVel) > 1: xVel = xVel/abs(xVel)
+        if abs(yVel) > 1: yVel = yVel/abs(xVel)
+        self.pos = (self.pos[0] + self.speed*xVel,
+                    self.pos[1] + self.speed*yVel)
 
     def draw(self, app, canvas):
         canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
