@@ -3,7 +3,7 @@ from cmu_112_graphics import *
 '''
 This file defines the arena environment
 ''' 
-lines = 5
+
 
 class Arena():
     def __init__(self):
@@ -12,10 +12,10 @@ class Arena():
 
     def update(self, app):
         for bot in self.friendlyBots:
-            bot.update(app, self.enemyBots, lines)
+            bot.update(app, self.enemyBots)
 
         for bot in self.enemyBots:
-            bot.update(app, self.friendlyBots, lines)
+            bot.update(app, self.friendlyBots)
 
     def draw(self, app, canvas):
         canvas.create_rectangle(0,0, app.arenaWidth, app.arenaHeight, fill="grey")
@@ -36,7 +36,6 @@ def appStarted(app):
     script = '''
     gunFire = True
     gunDirection = gunDirection + (2*pi*D_TIME)
-
     #initialize everything
     if FIRST_CALL
         #initialize movement
@@ -51,17 +50,12 @@ def appStarted(app):
     #normal loop case
     else 
         #movement
-        if bot.x > 400
-            xMov = 0-1
+        if (bot.x > 400) || (bot.x < 100)
+            xMov = 0-xMov
         endif
-        if bot.x < 100
-            xMov = 1
-        endif
-        if bot.y>400
-            yMov = 0-1
-        endif
-        if bot.y < 100
-            yMov = 1
+
+        if (bot.y>400) || (bot.y < 100)
+            yMov = 0-yMov
         endif
 
         #track total calls
@@ -80,9 +74,11 @@ def appStarted(app):
     gun = bots.Equipment("gun", 100, 100, None, 3, 2)
     bot = bots.Bot([gun], script, 5, (300,250), 10, 50)
     
-    bot.equipment.append(gun)
+    gun2 = bots.Equipment("gun", 100, 100, None, 3, 2)
+    bot2 = bots.Bot([gun2], script, 5, (250,300), 10, 50)
 
     app.arena.friendlyBots.append(bot)
+    app.arena.friendlyBots.append(bot2)
 
 def timerFired(app):
     app.arena.update(app)

@@ -325,13 +325,17 @@ def stringToScriptNumber(s):
 
 #Environment for script to run in
 class ScriptEnvironment():
-    def __init__(self, script = "", constants = dict(), externals = dict()):
+    def __init__(self, script = "", constants = None, externals = None):
         # Constants - cannot be changed within scripts
         # Externals - can be changed within scripts, returned by executeStep()
         # Externals are used as the way to get output from the script
         self.locs = dict()
-        self.constants = constants
-        self.externals = externals
+        if constants == None:
+            self.constants = dict()
+        else: self.constants = constants
+        if externals == None:
+            self.externals = dict()
+        else: self.externals = externals
         self.instructionIndex = 0
         self.lines = []
         self.parseCache = dict()

@@ -54,9 +54,11 @@ class Bot():
         self.env.constants["D_TIME"] = scriptables.ScriptNumber(time.time() - self.lastScriptUpdate)
 
 
-    def update(self, app, enemyBots, lines):
+    def update(self, app, enemyBots):
         dTime = time.time() - self.lastTime
+        
         if time.time() >= self.lastScriptUpdate + SCRIPT_UPDATE_SPEED:
+            
             #Inject new variables into script environment
             self.env.locs = cleanseLocals(self.env.locs)
             self.updateScriptConstants()
