@@ -6,10 +6,20 @@ This file contains classes defining bots, equipment for bots, projectiles, and
 their associated behaviours. It also includes some helper functions for this
 purpose
 '''
-SCRIPT_UPDATE_SPEED = 0.05
+SCRIPT_UPDATE_SPEED = 0.01
 
 def pointDistance(x0, y0, x1, y1):
     return (((x0-x1)**2)+((y0-y1)**2))**(1/2)
+
+def getClosestBot(pos, bots):
+    nearest = None
+    nearestDist = None
+    for bot in bots:
+        d = pointDistance(pos[0], pos[1], bot.pos[0], bot.pos[1])
+        if  nearestDist == None or d < nearest:
+            nearest = bot
+    return nearest, nearestDist
+
 
 def getEquipmentExternals(equipment):
     externals = dict()
@@ -21,13 +31,14 @@ def getEquipmentExternals(equipment):
 def cleanseLocals(locs):
     newLocs = dict()
     for var in locs:
-        if var[0] == '$':
+        if var[0] == '$': #preserve persistent variables
             newLocs[var] = locs[var]
     return newLocs
 
 class Bot():
 
-    def __init__(self, equipment, script, collisionRadius, position, health, speed):
+    def __init__(self, arena, equipment, script, collisionRadius, position, health, speed):
+        self.arena = arena
         self.equipment = equipment
         for eq in self.equipment:
             eq.bot = self
@@ -42,16 +53,27 @@ class Bot():
         self.lastTime = time.time()
         #Set up environment externals
         self.env.externals = getEquipmentExternals(self.equipment)
-        self.env.externals["xMov"] = scriptables.ScriptNumber(0)
-        self.env.externals["yMov"] = scriptables.ScriptNumber(0)
+        self.env.externals["move.speed"] = scriptables.ScriptNumber(0)
+        self.env.externals["move.direction"] = scriptables.ScriptNumber(0)
 
         self.env.constants["FIRST_CALL"] = scriptables.ScriptBoolean(True)
         self.env.constants["pi"] = scriptables.ScriptNumber(math.pi)
     
-    def updateScriptConstants(self):
+    def updateScriptConstants(self, enemyBots):
         self.env.constants["bot.x"] = scriptables.ScriptNumber(self.pos[0])
         self.env.constants["bot.y"] = scriptables.ScriptNumber(self.pos[1])
         self.env.constants["D_TIME"] = scriptables.ScriptNumber(time.time() - self.lastScriptUpdate)
+        self.env.constants["enemy.count"] = len(enemyBots)
+        if len(enemyBots) > 0:
+            nearest, nearestDist = getClosestBot(self.pos, enemyBots)
+            self.env.constants["enemy.nearest.x"] = \
+                scriptables.ScriptNumber(nearest.pos[0])
+            self.env.constants["enemy.nearest.y"] = \
+                scriptables.ScriptNumber(nearest.pos[1])
+            self.env.constants["enemy.nearest.reldir"] = \
+                scriptables.ScriptNumber(math.atan2(-1*(nearest.pos[1] - self.pos[1]),
+                                         nearest.pos[0] - self.pos[0]))
+
 
 
     def update(self, app, enemyBots):
@@ -61,7 +83,7 @@ class Bot():
             
             #Inject new variables into script environment
             self.env.locs = cleanseLocals(self.env.locs)
-            self.updateScriptConstants()
+            self.updateScriptConstants(enemyBots)
             self.env.executeAll()
             self.lastScriptUpdate = time.time()
             self.env.constants["FIRST_CALL"] = scriptables.ScriptBoolean(False) 
@@ -74,9 +96,13 @@ class Bot():
                 projectile.update(app, enemyBots)
 
         #Update movement
-        xVel, yVel = self.env.externals["xMov"].value, self.env.externals["yMov"].value
-        if abs(xVel) > 1: xVel = xVel/abs(xVel)
-        if abs(yVel) > 1: yVel = yVel/abs(xVel)
+        mSpeed  = self.env.externals["move.speed"].value 
+        mDir = self.env.externals["move.direction"].value
+        if abs(mSpeed) > 1: mSpeed = mSpeed/abs(mSpeed)
+
+        xVel = mSpeed * math.cos(mDir)
+        yVel = mSpeed * (-1) * math.sin(mDir)
+
         self.pos = (self.pos[0] + self.speed*xVel*dTime,
                     self.pos[1] + self.speed*yVel*dTime)
         self.lastTime = time.time()
@@ -145,19 +171,19 @@ class Equipment():
         self.fireCooldown = 1/fireRate
         self.projectileTexture = projectileTexture
         self.projectiles = []
-        self.externals = {self.name+"Direction": scriptables.ScriptNumber(0),
-                         self.name+"Fire": scriptables.ScriptBoolean(False)}
+        self.externals = {self.name+".direction": scriptables.ScriptNumber(0),
+                         self.name+".fire": scriptables.ScriptBoolean(False)}
         self.lastFire = 0
         self.bot = None
         self.damage=damage
     
     def update(self, externals):
-        if externals[self.name+"Fire"].value:
+        if externals[self.name+".fire"].value:
             if time.time() - self.lastFire >= self.fireCooldown:
                 self.lastFire = time.time()
                 #Create a new projectile
                 newProjectile = Projectile(self, self.projectileSpeed, 
-                    self.projectileTexture, self.bot.pos, externals[self.name+"Direction"].value,
+                    self.projectileTexture, self.bot.pos, externals[self.name+".direction"].value,
                     self.projectileColRad, self.damage)
                 self.projectiles.append(newProjectile)
 

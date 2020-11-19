@@ -1,15 +1,18 @@
 basic syntax, if/else
 
-xMov, yMov
-botX, botY
+move.speed, move.direction
+bot.x, bot.y
+enemy.count
+enemy.nearest.x, enemy.nearest.y, enemy.nearest.reldir
+equipmentFire
+equipmentDirection
+
 builtins
 random
 
 D_TIME
 FIRST_CALL
 pi
-
-firstCall
 
 extnerals persist
 locals don't
