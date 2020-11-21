@@ -1,4 +1,5 @@
 basic syntax, if/else
+^ operator - equivalent to multiplying everything to the rigth by -1
 
 move.speed, move.direction
 bot.x, bot.y

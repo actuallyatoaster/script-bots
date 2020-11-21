@@ -471,11 +471,11 @@ class ScriptEnvironment():
         elif f == 'tan':
             return ScriptNumber(math.tan(rhs.value))
         elif f == 'arccos':
-            return ScriptNumber(math.arccos(rhs.value))
+            return ScriptNumber(math.acos(rhs.value))
         elif f == 'arcsin':
-            return ScriptNumber(math.arcsin(rhs.value))
+            return ScriptNumber(math.asin(rhs.value))
         elif f == 'arctan':
-            return ScriptNumber(math.arctan(rhs.value))
+            return ScriptNumber(math.atan(rhs.value))
         elif f == 'abs':
             return ScriptNumber(abs(rhs.value))
         elif f == 'floor':
@@ -490,7 +490,17 @@ class ScriptEnvironment():
         tokens = deNest(tokens)
         #Type 1
         if isinstance(tokens, list) and len(tokens) > 1:
-            if len(tokens) >= 3:
+            #Case for negative numbers
+            if deNest(tokens[0]) == "-":
+                scriptError("BotScript does not support writing negatives"+
+                " with '-'. Please use the negative operator '^' or '0-<num>'." )
+            if tokens[0] == "^":
+                rhs = self.evaluateSubExpression(tokens[1:])
+                if rhs.type != "num":
+                    scriptError(f"Cannot make type {rhs.type} negative")
+                else:
+                    return ScriptNumber(-1*rhs.value)
+            elif len(tokens) >= 3:
                 operator = deNest(tokens[1])
                 rhs = self.evaluateSubExpression(tokens[2:])
                 #Using a builtin function
@@ -499,34 +509,8 @@ class ScriptEnvironment():
                     return self.evalBuiltin(deNest(tokens[0]), rhs)
                 lhs = self.evaluateSubExpression(tokens[0])
 
-                if rhs.type != lhs.type:
-                    scriptError(f"Cannot use operator {operator} with " +
-                        f"types {rhs.type} and {lhs.type}")
+                return self.evalOperator(lhs, operator, rhs)
                 
-                if operator == '+':
-                    return ScriptNumber(lhs.value + rhs.value)
-                elif operator == '-':
-                    return ScriptNumber(lhs.value - rhs.value)
-                elif operator == '/':
-                    if rhs.value == 0:
-                        scriptError("Dividing by zero!")
-                        return
-                    return ScriptNumber(lhs.value / rhs.value)
-                elif operator == '*':
-                    return ScriptNumber(lhs.value * rhs.value)
-                elif operator == '**':
-                    return ScriptNumber(lhs.value** rhs.value)
-                elif operator == '//':
-                    if rhs.value == 0:
-                        scriptError("Dividing by zero!")
-                        return
-                    return ScriptNumber(lhs.value// rhs.value)
-                elif operator == '%':
-                    return ScriptNumber(lhs.value % rhs.value)
-            #Case for negative numbers
-            elif len(tokens) == 2 and deNest(tokens[0]) == "-":
-                rhs = self.evaluateSubExpression(tokens[1:])
-                return ScriptNumber(-(rhs.value))
             else: 
                 scriptError("Improper expression")
                 return
@@ -536,7 +520,32 @@ class ScriptEnvironment():
             return self.getVariableOrConstant(tokens)
         elif len(tokens) == 1:
             return self.getVariableOrConstant(tokens[0])
-
+    def evalOperator(self, lhs, operator, rhs):
+        if rhs.type != lhs.type:
+            scriptError(f"Cannot use operator {operator} with " +
+                f"types {rhs.type} and {lhs.type}")
+        if operator == "^":
+            scriptError("Operator '^' cannot take two arguments")
+        elif operator == '+':
+            return ScriptNumber(lhs.value + rhs.value)
+        elif operator == '-':
+            return ScriptNumber(lhs.value - rhs.value)
+        elif operator == '/':
+            if rhs.value == 0:
+                scriptError("Dividing by zero!")
+                return
+            return ScriptNumber(lhs.value / rhs.value)
+        elif operator == '*':
+            return ScriptNumber(lhs.value * rhs.value)
+        elif operator == '**':
+            return ScriptNumber(lhs.value** rhs.value)
+        elif operator == '//':
+            if rhs.value == 0:
+                scriptError("Dividing by zero!")
+                return
+            return ScriptNumber(lhs.value// rhs.value)
+        elif operator == '%':
+            return ScriptNumber(lhs.value % rhs.value)
     def evaluateExpression(self, expression):
         '''
         A legal expression takes one of two forms:
@@ -547,24 +556,23 @@ class ScriptEnvironment():
         variable, otherwise we recursively evaluate the expression and apply
         the operator
         '''
-        operators = ['+', '-', '/', '*', '%', '**', '//', ':']
+        operators = ['+', '-', '/', '*', '%', '**', '//', ':', '^']
         boolOperators = ['&&', '||', '&!', '|!', '!']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
 
         if isBoolExpression(expression, comparators, boolOperators):
             #Evaluate as a boolean expression
-            parsed = []
             if expression in self.parseCache:
                 parsed = self.parseCache[expression]
             else:
                 parsed = deNest(parseExpression(expression, comparators + boolOperators + operators))
                 self.parseCache[expression] = parsed
-
+            
             if len(parsed) == 1:
                 return self.getVariableOrConstant(parsed[0])
             return self.evaluateBoolExpression(parsed, comparators)
         else:
-            #Evaluate as a numerical expressionparsed = []
+            #Evaluate as a numerical expression
             if expression in self.parseCache:
                 parsed = self.parseCache[expression]
             else:
