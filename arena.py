@@ -31,13 +31,13 @@ class Arena():
 #####Temp stuff!!!!!
 
 def appStarted(app):
+    #Want everything as smooth as possible, all the other timing is manual anyway
     app.timerDelay = 1
     app.arena = Arena()
     app.arenaWidth , app.arenaHeight = 500,500
     script = '''
     gun.fire = True
-    #gun.direction = gun.direction + (2*pi*D_TIME)
-    gun.direction = enemy.nearest.reldir
+    gun.direction = enemy.nearest.reldir #aim at enemy
     #initialize everything
     if FIRST_CALL
         #initialize movement

@@ -6,7 +6,7 @@ This file contains classes defining bots, equipment for bots, projectiles, and
 their associated behaviours. It also includes some helper functions for this
 purpose
 '''
-SCRIPT_UPDATE_SPEED = 0.01
+SCRIPT_UPDATE_SPEED = 0.01 #Min time interval between script updates, increase this if performance issues
 
 def pointDistance(x0, y0, x1, y1):
     return (((x0-x1)**2)+((y0-y1)**2))**(1/2)
@@ -41,7 +41,7 @@ class Bot():
         self.arena = arena
         self.equipment = equipment
         for eq in self.equipment:
-            eq.bot = self
+            eq.bot = self #Equipment needs to know what it's attached to
 
         self.env = scriptables.ScriptEnvironment(script)
         self.pos = position
@@ -49,7 +49,7 @@ class Bot():
         self.collisionRadius = collisionRadius
         self.lastScriptUpdate = time.time()
         self.speed = speed
-        #deltaTime for updates
+        #D_TIME for updates
         self.lastTime = time.time()
         #Set up environment externals
         self.env.externals = getEquipmentExternals(self.equipment)
@@ -79,8 +79,8 @@ class Bot():
     def update(self, app, enemyBots):
         dTime = time.time() - self.lastTime
         
+        #Do script updates
         if time.time() >= self.lastScriptUpdate + SCRIPT_UPDATE_SPEED:
-            
             #Inject new variables into script environment
             self.env.locs = cleanseLocals(self.env.locs)
             self.updateScriptConstants(enemyBots)

@@ -133,7 +133,7 @@ def scanPrefixIndex(lines, index, startPrefix, endPrefix, reverse = False):
                 return i if not reverse else l-i
             else:
                 depth -= 1
-    scriptError(f"Bad syntax: {startPrefix} on line {index} does note have"+
+    scriptError(f"Bad syntax: {startPrefix} on line {index} does not have"+
                 f" a matching {endPrefix}")
 
 #Now entering the recursion zone😈...
@@ -225,7 +225,7 @@ def parseExpression(expression, group):
 #ex. ['True', '&&', '!', 'False'] --> ['True', '&&', ['!', 'False']]
 # ['True' '&&', '!', ['False', '&&', 'True]]
 # --> ['True' '&&', ['!', ['False', '&&', 'True]]]
-#NOTE: this function is a recipe for alias hell if used incorrectly
+#NOTE: this function feels like a recipe for alias hell if used incorrectly
 def bangPreprocessor(tokens):
     new = []
     first = -1
@@ -298,9 +298,7 @@ class ScriptString(ScriptVariable):
         super().__init__("str", value)
 
 
-''' TODO: Delete this
-A Collection emulates a class/list/set/etc. It can contain unlimited 
-'''
+#TODO: Delete this class
 class ScriptCollection(ScriptVariable):
     def __init__(self):
         super().__init__("clct", dict())
@@ -346,10 +344,6 @@ class ScriptEnvironment():
                     line = line[:line.find('#')]
                 if line !="":
                     self.lines.append(line)
-        
-
-    def loadScript(self, script):
-        pass
 
     #This function takes a constant or variable and returns its value
     #Also handles the following builtin functions: cos, sin, tan, arccos,
@@ -401,22 +395,24 @@ class ScriptEnvironment():
     # Recursively evaluates parsed boolean expressions
     def evaluateBoolExpression(self, tokens, comparators):
         tokens  = deNest(tokens)
-        #Special case for ! operator
-        if len(tokens) == 2:
-            if deNest(tokens[0]) != "!":
-                scriptError("Improper expression")
-                return
-            rhs = self.evaluateBoolExpression(tokens[1], comparators)
-            return ScriptBoolean(not rhs.value)
-        elif len(tokens) > 2 and "!" in tokens:
-            #This is really janky, i know 
-            tokens = bangPreprocessor(tokens)
-            return self.evaluateBoolExpression(tokens, comparators)
-
-        #Numerical Comparisons
+        
         if isinstance(tokens, list):
-            if len(tokens) == 1:
+            #Special case for ! operator
+            if len(tokens) == 2:
+                if deNest(tokens[0]) != "!":
+                    scriptError("Improper expression")
+                    return
+                rhs = self.evaluateBoolExpression(tokens[1], comparators)
+                return ScriptBoolean(not rhs.value)
+            elif len(tokens) > 2 and "!" in tokens:
+                #This is really janky, i know 
+                tokens = bangPreprocessor(tokens)
+                return self.evaluateBoolExpression(tokens, comparators)
+                
+            elif len(tokens) == 1:
                 return self.getVariableOrConstant(tokens[0])
+            
+            #Numerical Comparisons
             elif isComparison(tokens, comparators):
 
                 compIndex = findGroupIndex(tokens, comparators)
@@ -488,10 +484,12 @@ class ScriptEnvironment():
     #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
         tokens = deNest(tokens)
-        #Type 1
+        #expression with some kind of operation
         if isinstance(tokens, list) and len(tokens) > 1:
             #Case for negative numbers
             if deNest(tokens[0]) == "-":
+                # Having an operator that can take a variable number of args
+                # opens a huge can of worms in terms of parsing
                 scriptError("BotScript does not support writing negatives"+
                 " with '-'. Please use the negative operator '^' or '0-<num>'." )
             if tokens[0] == "^":
@@ -515,11 +513,12 @@ class ScriptEnvironment():
                 scriptError("Improper expression")
                 return
 
-        #Type 2
+        #get variable or constant value
         elif not isinstance(tokens, list):
             return self.getVariableOrConstant(tokens)
         elif len(tokens) == 1:
             return self.getVariableOrConstant(tokens[0])
+
     def evalOperator(self, lhs, operator, rhs):
         if rhs.type != lhs.type:
             scriptError(f"Cannot use operator {operator} with " +
@@ -546,16 +545,9 @@ class ScriptEnvironment():
             return ScriptNumber(lhs.value// rhs.value)
         elif operator == '%':
             return ScriptNumber(lhs.value % rhs.value)
+        scriptError(f"Unknown operator: {operator}")
     def evaluateExpression(self, expression):
-        '''
-        A legal expression takes one of two forms:
-        1) variable
-        2) variable operator expression
-        3) expression comparator expresiion (bool expression)
-        So we split by legal operators, and if length is one just return the
-        variable, otherwise we recursively evaluate the expression and apply
-        the operator
-        '''
+
         operators = ['+', '-', '/', '*', '%', '**', '//', ':', '^']
         boolOperators = ['&&', '||', '&!', '|!', '!']
         comparators = ['<', '>', '<=', '>=', '==', '!=']
@@ -582,11 +574,14 @@ class ScriptEnvironment():
             if len(parsed) == 1: #TODO: i think this and corresponding in bool expression can be removed
                 return self.getVariableOrConstant(parsed[0])
             return self.evaluateSubExpression(parsed)
-    
+
+    #This originally a bit of a hack for debugging but it works perfectly
+    #Executes a whole script and return local and external vars at completion
     def executeAll(self):
         while self.executeNext(): pass
         self.instructionIndex = 0
         return self.locs, self.externals
+
     #Execute the next line
     def executeNext(self):
         try:
@@ -605,9 +600,8 @@ class ScriptEnvironment():
     def executeStep(self, step, opIndex, verbose=False):
         step = removeWhiteSpace(step)
         comparators = ['<', '>', '<=', '>=', '==', '!='] #used to check '=' isn't = '==' or '>=' etc.
-        
-        #variable assignment
         assignmentSplit = splitStrByGroup(step, comparators + ["="])
+        
         #Line is assigning a variable
         if '=' in assignmentSplit:
             if assignmentSplit[1] != '=' or assignmentSplit.count("=") >1:
@@ -642,8 +636,6 @@ class ScriptEnvironment():
             else:
                 endElse = scanPrefixIndex(self.lines, opIndex, 'else', 'endelse')
                 return endElse
-        #Line is beggining of while loop
-        #Line is end of while loop
         #None of the above, just expression, print for debugging purposes
         elif verbose and step != "":
             scriptLog(self.evaluateExpression(step).value)
@@ -662,17 +654,16 @@ if __name__ == "__main__":
     def repl(env):
         inp = ""
         while inp != "exit":
-            inp = input("S>> ")
-            if inp != "exit":
-                env.executeStep(inp, 0, verbose=True)
-                # try:
-                #     env.executeStep(inp, 0, verbose=True)
-                # except ScriptError:
-                #     pass
-                # except Exception as err:
-                #     print(f"Unknown Error: {err}")
+            try:
+                inp = input("S>> ")
+                if inp != "exit":
+                    env.executeStep(inp, 0, verbose=True)
+            except ScriptError:
+                pass
+            except Exception as err:
+                print(f"Unknown Error: {err}")
     #Setup some helpful variables for debugging
-    operators = ['+', '-', '/', '*', '%', '**', '//', ':']
+    operators = ['+', '-', '/', '*', '%', '**', '//', ':', '^']
     boolOperators = ['&&', '||', '&!', '|!', '!']
     comparators = ['<', '>', '<=', '>=', '==', '!=']        
     #Setup an empty script environment and start repl

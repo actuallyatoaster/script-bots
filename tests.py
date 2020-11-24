@@ -1,3 +1,8 @@
+'''
+Some tests to make sure all the scripting stuff is behaving properly.
+This won't be included in the final project.
+'''
+
 from scriptables import *
 
 class Test():
