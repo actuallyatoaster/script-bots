@@ -350,7 +350,10 @@ class ScriptEnvironment():
     #arcsin, arctan, abs, floor, ceil, round
     def getVariableOrConstant(self, var):
         #Just a single variable or constant to return value of
-        if var.isdigit(): #TODO: support floats
+        if var.isdigit() or (
+            var.count('.') == 1 and
+            var.translate({ord('.'):None}).isdigit() #Checks if name exclusing "." is all numbers
+        ):
             return stringToScriptNumber(var)
         elif var == "True":
             return ScriptBoolean(True)

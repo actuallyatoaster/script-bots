@@ -1,0 +1,66 @@
+{
+    "weapons":{
+        "standard":{
+            "displayName": "Standard Gun",
+            "scriptName": "standard",
+            "projectileSpeed": 100,
+            "fireRate": 5,
+            "spritePath": "",
+            "damage": 4,
+            "projColRad": 2,
+            "cost": 150
+        },
+
+        "cloud":{
+            "displayName": "Cloud Sprayer",
+            "scriptName": "cloud",
+            "projectileSpeed": 50,
+            "fireRate": 80,
+            "spritePath": "",
+            "damage": 2,
+            "projColRad": 4,
+            "cost": 500
+        },
+
+        "sniper": {
+            "displayName": "Sniper Rifle",
+            "scriptName": "sniper",
+            "projectileSpeed": 1000,
+            "fireRate": 2,
+            "spritePath": "",
+            "damage": 15,
+            "projColRad": 2,
+            "cost": 800
+        },
+
+        "minigun": {
+            "displayName": "Minigun",
+            "scriptName": "minigun",
+            "projectileSpeed": 100,
+            "fireRate": 100,
+            "spritePath": "",
+            "damage": 3,
+            "projColRad": 2,
+            "cost": 900
+        }
+    },
+
+    "buffs":{
+        "health":{
+            "displayName": "Health Boost",
+            "cost": 500,
+            "modifier": 1.2
+        },
+        "speed":{
+            "displayName": "Speed Boost",
+            "cost": 300,
+            "modifier": 1.5
+        },
+        "damage":{
+            "displayName": "Damage Increase",
+            "cost": 600,
+            "modifier": 1.1
+        }
+    }
+
+}

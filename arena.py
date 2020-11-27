@@ -6,9 +6,11 @@ This file defines the arena environment
 
 
 class Arena():
-    def __init__(self):
+    def __init__(self, dims):
+        self.dims = dims
         self.friendlyBots = []
         self.enemyBots = []
+        self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 500)
 
     def update(self, app):
         for bot in self.friendlyBots:
@@ -18,13 +20,15 @@ class Arena():
             bot.update(app, self.friendlyBots)
 
     def draw(self, app, canvas):
-        canvas.create_rectangle(0,0, app.arenaWidth, app.arenaHeight, fill="grey")
+        canvas.create_rectangle(0,0, self.dims[0], self.dims[1], fill="grey")
 
         for bot in self.friendlyBots + self.enemyBots:
             bot.draw(app, canvas)
             for eq in bot.equipment:
                 for projectile in eq.projectiles:
                     projectile.draw(app, canvas)
+
+        self.objective.draw(canvas)
         
 
 
@@ -33,8 +37,8 @@ class Arena():
 def appStarted(app):
     #Want everything as smooth as possible, all the other timing is manual anyway
     app.timerDelay = 1
-    app.arena = Arena()
     app.arenaWidth , app.arenaHeight = 500,500
+    app.arena = Arena((500,500))
     script = '''
     gun.fire = True
     gun.direction = enemy.nearest.reldir #aim at enemy
@@ -64,7 +68,7 @@ def appStarted(app):
 
     #log average script calls per second
     $dTimeSum = $dTimeSum + D_TIME
-    log: round:($totalCalls / $dTimeSum)
+    #log: round:($totalCalls / $dTimeSum)
     '''
     gun = bots.Equipment("gun", 100, 100, None, 3, 2)
     bot = bots.Bot(app.arena, [gun], script, 5, (300,250), 10, 50)

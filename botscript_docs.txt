@@ -15,6 +15,9 @@ D_TIME
 FIRST_CALL
 pi
 
+A_WIDTH
+A_HEIGHT
+
 extnerals persist
 locals don't
 

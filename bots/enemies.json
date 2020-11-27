@@ -1,0 +1,44 @@
+{
+    "grunt": {
+        "displayName":"Grunt",
+        "buffs": [],
+        "weapons":[
+            "standard"
+        ],
+        "frequency": 20,
+        "reward": 75,
+        "script": "bots/scripts/grunt.bot"
+    },
+
+    "slicer":{
+        "displayName":"Slicer",
+        "buffs": ["speed"],
+        "weapons":[
+            "minigun"
+        ],
+        "frequency": 4,
+        "reward": 200,
+        "script": "bots/scripts/slicer.bot"
+    },
+    "kite":{
+        "displayName":"Kite",
+        "buffs": ["speed", "damage"],
+        "weapons":[
+            "sniper"
+        ],
+        "frequency": 2,
+        "reward": 350,
+        "script": "bots/scripts/kite.bot"
+    },
+
+    "heavy":{
+        "displayName":"Heavy",
+        "buffs": ["health", "damage"],
+        "weapons":[
+            "cloud"
+        ],
+        "frequency": 1,
+        "reward": 750,
+        "script": "bots/scripts/heavy.bot"
+    }
+}
