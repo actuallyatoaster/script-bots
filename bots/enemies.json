@@ -8,7 +8,8 @@
         "frequency": 20,
         "reward": 75,
         "script": "bots/scripts/grunt.bot",
-        "health": 1
+        "health": 1,
+        "minWave":0
     },
 
     "slicer":{
@@ -20,7 +21,8 @@
         "frequency": 4,
         "reward": 200,
         "script": "bots/scripts/slicer.bot",
-        "health": 1
+        "health": 1,
+        "minWave":2
     },
     "kite":{
         "displayName":"Kite",
@@ -31,7 +33,8 @@
         "frequency": 2,
         "reward": 350,
         "script": "bots/scripts/kite.bot",
-        "health": 1
+        "health": 1,
+        "minWave":5
     },
 
     "heavy":{
@@ -43,6 +46,7 @@
         "frequency": 1,
         "reward": 750,
         "script": "bots/scripts/heavy.bot",
-        "health": 8
+        "health": 9,
+        "minWave":13
     }
 }

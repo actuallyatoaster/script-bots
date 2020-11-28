@@ -32,8 +32,10 @@ class Arena():
         self.objective.draw(canvas)
 
         #draw edges to mask things going slightly off the arena area
-        canvas.create_rectangle(self.dims[0], 0, app.height, app.width, fill="white")
-        canvas.create_rectangle(0, self.dims[1], app.height, app.width, fill="white")
+        canvas.create_rectangle(self.dims[0], 0, app.height, app.width, 
+            fill="white", width=0)
+        canvas.create_rectangle(0, self.dims[1], app.height, app.width, 
+            fill="white", width=0)
         
 
 
@@ -44,39 +46,8 @@ def appStarted(app):
     app.timerDelay = 1
     app.arenaWidth , app.arenaHeight = 500,500
     app.arena = Arena((500,500))
-    script = '''
-    gun.fire = True
-    gun.direction = enemy.nearest.reldir #aim at enemy
-    #initialize everything
-    if FIRST_CALL
-        #initialize movement
-        move.speed = 1
 
-        #timing stuff
-        num $totalCalls = 1 
-        num $dTimeSum = 0 #total time elapsed
-    endif
-
-    #normal loop case
-    else 
-        #movement
-        move.direction = move.direction + ((2*pi*D_TIME)/10)
-
-        #track total calls
-        $totalCalls = $totalCalls+1
-        
-        #only shoot every other second
-        if ((round:$dTimeSum) % 2) == 0 #test comment, this shouldn't crash
-            gun.fire = False # test comment#2
-        endif
-    endelse
-
-    #log average script calls per second
-    $dTimeSum = $dTimeSum + D_TIME
-    #log: round:($totalCalls / $dTimeSum)
-    '''
-    gun = bots.Equipment("gun", 100, 100, None, 3, 2)
-    bot = bots.Bot(app.arena, [gun], script, 5, (300,250), 10, 50)
+    bot = loader.createBotFromFile("demo", app.arena, (400,400), typeFile="bots/bots.json")
     
     bot2 = loader.createBotFromFile("heavy", app.arena, (400,400))
 

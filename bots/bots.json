@@ -1,0 +1,10 @@
+{
+    "demo":{
+        "displayName":"Demo",
+        "buffs": [],
+        "weapons":[
+            "minigun"
+        ],
+        "script": "bots/scripts/demo.bot"
+    }
+}

@@ -1,0 +1,31 @@
+#Demo bot for testing/debugging
+
+minigun.fire = True
+minigun.direction = enemy.nearest.reldir #aim at enemy
+#initialize everything
+if FIRST_CALL
+    #initialize movement
+    move.speed = 1
+
+    #timing stuff
+    num $totalCalls = 1 
+    num $dTimeSum = 0 #total time elapsed
+endif
+
+#normal loop case
+else 
+    #movement
+    move.direction = move.direction + ((2*pi*D_TIME)/10)
+
+    #track total calls
+    $totalCalls = $totalCalls+1
+    
+    #only shoot every other second
+    if ((round:$dTimeSum) % 2) == 0 #test comment, this shouldn't crash
+        minigun.fire = False # test comment#2
+    endif
+endelse
+
+#log average script calls per second
+$dTimeSum = $dTimeSum + D_TIME
+#log: round:($totalCalls / $dTimeSum)
