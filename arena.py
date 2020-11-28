@@ -49,7 +49,7 @@ def appStarted(app):
 
     bot = loader.createBotFromFile("demo", app.arena, (400,400), typeFile="bots/bots.json")
     
-    bot2 = loader.createBotFromFile("heavy", app.arena, (400,400))
+    bot2 = loader.createBotFromFile("grunt", app.arena, (400,400))
 
     app.arena.friendlyBots.append(bot)
     app.arena.enemyBots.append(bot2)

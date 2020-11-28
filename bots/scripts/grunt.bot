@@ -1,2 +1,32 @@
 # grunts choose to either follow the nearest bot and shoot it, or
 # circle around the objective and shoot it
+
+if FIRST_CALL
+    num $mode = rand:2 #1 = chase bot, 0 = shoot objective
+    num $kiteDistance = 80+(rand:50)
+    standard.fire = True
+endif
+else
+    if $mode == 1
+        move.direction = enemy.nearest.reldir
+        num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+        if enemyDist < $kiteDistance
+            move.speed = ^1
+        endif
+        else
+            move.speed = 1
+        endelse
+        standard.direction = enemy.nearest.reldir
+    endif
+    else #objective mode
+        num objDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+        if objDist > $kiteDistance + 3
+            move.direction = objective.reldir
+        endif
+        else
+            move.direction = objective.reldir + (pi/2)
+        endelse
+        move.speed = 1
+        standard.direction = objective.reldir
+    endelse
+endelse

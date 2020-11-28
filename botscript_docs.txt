@@ -18,6 +18,8 @@ pi
 A_WIDTH
 A_HEIGHT
 
+rand:x integer between 0(inclusive) and x (exclusive)
+
 extnerals persist
 locals don't
 

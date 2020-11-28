@@ -8,6 +8,7 @@ and their variables are stored, and scripts are parsed and run.
 # be reworked if time allows
 import string
 import math
+import random
 
 #Some configuration for the script environment
 #TODO: move this to a config file
@@ -194,7 +195,7 @@ def parseExpression(expression, group):
         while i <len(spl):
             parsedSub = parseSubExpr(spl[i], group)
             #Case where the parsed expression only has one element
-            if len(parsedSub) == 1:
+            if len(parsedSub) == 1 or parsedSub in group:
                 spl[i] = parsedSub
                 i += 1
             #Case where the last character in the sub expr is an operator
@@ -459,7 +460,8 @@ class ScriptEnvironment():
     #Evaluate a builtin function f on ScriptNumber rhs
     def evalBuiltin(self, f, rhs):
         builtins = {"cos", "sin", "tan", "arccos", "arcsin", "arctan", "abs",
-                    "floor", "ceil", "round"}
+                    "floor", "ceil", "round", "rand"}
+        
         if f not in builtins:
             scriptError(f"Undefined function: {f}")
             return
@@ -483,6 +485,8 @@ class ScriptEnvironment():
             return ScriptNumber(math.ceil(rhs.value))
         elif f == 'round':
             return ScriptNumber(round(rhs.value))
+        elif f == 'rand':
+            return ScriptNumber(random.randrange(rhs.value))
 
     #This recursively evaluates parsed numerical expressions
     def evaluateSubExpression(self, tokens):
