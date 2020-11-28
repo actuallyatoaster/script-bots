@@ -1,6 +1,6 @@
 import bots
 import loader
-from cmu_112_graphics import *
+from cmu_112_graphics import * #From https://www.cs.cmu.edu/~112/notes/cmu_112_graphics.py
 '''
 This file defines the arena environment
 ''' 
@@ -46,13 +46,21 @@ def appStarted(app):
     app.timerDelay = 1
     app.arenaWidth , app.arenaHeight = 500,500
     app.arena = Arena((500,500))
-
-    bot = loader.createBotFromFile("demo", app.arena, (400,400), typeFile="bots/bots.json")
     
-    bot2 = loader.createBotFromFile("grunt", app.arena, (400,400))
+    for i in range(100):
+        bot = loader.createBotFromFile("demo", app.arena, (i*50,i*20+200), typeFile="bots/bots.json")
+        app.arena.friendlyBots.append(bot)
+    for i in range(10000):
+        
+        pos = ((500//20) * i, (500//20) * i)
+        if i > 30:
+            bot2 = loader.createBotFromFile("grunt", app.arena, pos)
+        else:
+            bot2 = loader.createBotFromFile("heavy", app.arena, pos)
+        app.arena.enemyBots.append(bot2)
 
-    app.arena.friendlyBots.append(bot)
-    app.arena.enemyBots.append(bot2)
+    
+    
 
 def timerFired(app):
     app.arena.update(app)

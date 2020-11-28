@@ -6,7 +6,7 @@ This file contains classes defining bots, equipment for bots, projectiles, and
 their associated behaviours. It also includes some helper functions for this
 purpose
 '''
-SCRIPT_UPDATE_SPEED = 0.01 #Min time interval between script updates, increase this if performance issues
+SCRIPT_UPDATE_SPEED = 0.02 #Min time interval between script updates, increase this if performance issues
 
 def pointDistance(x0, y0, x1, y1):
     return (((x0-x1)**2)+((y0-y1)**2))**(1/2)
@@ -142,6 +142,9 @@ class Bot():
         canvas.create_text(self.pos[0], self.pos[1]- 5, text=f"{self.health}")
     def damage(self, dmg):
         self.health -= dmg
+        if self.health <= 0:
+            if self in self.arena.friendlyBots: self.arena.friendlyBots.remove(self)
+            elif self in self.arena.enemyBots: self.arena.enemyBots.remove(self)
 
 
 class Projectile():
