@@ -1,2 +1,26 @@
 #Heavies choose a random spot around the outskirts of the arena and shoot
 # continuously in a 90-degree arc into the arena
+
+if FIRST_CALL
+    num $min = objective.reldir - (pi/2)
+    num $max = objective.reldir + (pi/2)
+    cloud.direction = objective.reldir
+    cloud.fire = True
+    num $moveDir = 1
+    num $moveSpeed = pi
+endif
+else
+    cloud.direction = cloud.direction + (D_TIME*$moveDir*$moveSpeed)
+    if cloud.direction <= $min
+        $moveDir = 1
+    endif
+    if cloud.direction >= $max
+        $moveDir = ^1
+    endif
+
+    move.direction = objective.reldir + (pi/2)
+    move.speed = 0.2
+    $max = objective.reldir + (pi/2)
+    $min = objective.reldir - (pi/2)
+
+endelse

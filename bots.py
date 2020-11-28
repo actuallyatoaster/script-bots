@@ -73,7 +73,7 @@ class Bot():
         self.env.constants["A_HEIGHT"] = scriptables.ScriptNumber(self.arena.dims[1])
 
         self.env.constants["objective.x"] = scriptables.ScriptNumber(self.arena.objective.pos[0])
-        self.env.constants["objective.y"] - scriptables.ScriptNumber(self.arena.objective.pos[1])
+        self.env.constants["objective.y"] = scriptables.ScriptNumber(self.arena.objective.pos[1])
 
     
     def updateScriptConstants(self, enemyBots):
@@ -219,8 +219,10 @@ class Equipment():
 
 class Objective(Bot): #Objectives are just bots that don't do anything
     def __init__(self, arena, size, position, health):
-        super().__init__(arena, [], "", size, position, health, 0)
-        self.size = size
+        self.arena = arena
+        self.pos = position
+        self.health = health
+        self.collisionRadius = self.size = size
 
     def update(self, _): pass #Make it so the update function does nothing
 

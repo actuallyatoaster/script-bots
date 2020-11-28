@@ -14,11 +14,11 @@
         "cloud":{
             "displayName": "Cloud Sprayer",
             "scriptName": "cloud",
-            "projectileSpeed": 50,
-            "fireRate": 80,
+            "projectileSpeed": 40,
+            "fireRate": 10,
             "spritePath": "",
-            "damage": 2,
-            "projColRad": 4,
+            "damage": 10,
+            "projColRad": 5,
             "cost": 500
         },
 

@@ -7,7 +7,8 @@
         ],
         "frequency": 20,
         "reward": 75,
-        "script": "bots/scripts/grunt.bot"
+        "script": "bots/scripts/grunt.bot",
+        "health": 1
     },
 
     "slicer":{
@@ -18,7 +19,8 @@
         ],
         "frequency": 4,
         "reward": 200,
-        "script": "bots/scripts/slicer.bot"
+        "script": "bots/scripts/slicer.bot",
+        "health": 1
     },
     "kite":{
         "displayName":"Kite",
@@ -28,7 +30,8 @@
         ],
         "frequency": 2,
         "reward": 350,
-        "script": "bots/scripts/kite.bot"
+        "script": "bots/scripts/kite.bot",
+        "health": 1
     },
 
     "heavy":{
@@ -39,6 +42,7 @@
         ],
         "frequency": 1,
         "reward": 750,
-        "script": "bots/scripts/heavy.bot"
+        "script": "bots/scripts/heavy.bot",
+        "health": 8
     }
 }

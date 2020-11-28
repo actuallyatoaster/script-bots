@@ -1,4 +1,5 @@
 import bots
+import loader
 from cmu_112_graphics import *
 '''
 This file defines the arena environment
@@ -29,6 +30,10 @@ class Arena():
                     projectile.draw(app, canvas)
 
         self.objective.draw(canvas)
+
+        #draw edges to mask things going slightly off the arena area
+        canvas.create_rectangle(self.dims[0], 0, app.height, app.width, fill="white")
+        canvas.create_rectangle(0, self.dims[1], app.height, app.width, fill="white")
         
 
 
@@ -73,8 +78,7 @@ def appStarted(app):
     gun = bots.Equipment("gun", 100, 100, None, 3, 2)
     bot = bots.Bot(app.arena, [gun], script, 5, (300,250), 10, 50)
     
-    gun2 = bots.Equipment("gun", 1000, 2, None, 15, 2)
-    bot2 = bots.Bot(app.arena, [gun2], script, 5, (250,300), 10, 75)
+    bot2 = loader.createBotFromFile("heavy", app.arena, (400,400))
 
     app.arena.friendlyBots.append(bot)
     app.arena.enemyBots.append(bot2)
