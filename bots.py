@@ -222,7 +222,8 @@ class Objective(Bot): #Objectives are just bots that don't do anything
         self.arena = arena
         self.pos = position
         self.health = health
-        self.collisionRadius = self.size = size
+        self.collisionRadius = size/2
+        self.size = size
 
     def update(self, _): pass #Make it so the update function does nothing
 

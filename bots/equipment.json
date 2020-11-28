@@ -7,7 +7,7 @@
             "fireRate": 5,
             "spritePath": "",
             "damage": 4,
-            "projColRad": 3,
+            "projColRad": 2,
             "cost": 150
         },
 
