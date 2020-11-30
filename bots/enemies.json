@@ -6,7 +6,7 @@
             "standard"
         ],
         "frequency": 20,
-        "reward": 75,
+        "reward": 150,
         "script": "bots/scripts/grunt.bot",
         "health": 1,
         "minWave":0
@@ -19,7 +19,7 @@
             "minigun"
         ],
         "frequency": 4,
-        "reward": 200,
+        "reward": 250,
         "script": "bots/scripts/slicer.bot",
         "health": 1,
         "minWave":2
@@ -30,8 +30,8 @@
         "weapons":[
             "sniper"
         ],
-        "frequency": 2,
-        "reward": 350,
+        "frequency": 2000,
+        "reward": 500,
         "script": "bots/scripts/kite.bot",
         "health": 1,
         "minWave":5
@@ -44,7 +44,7 @@
             "cloud"
         ],
         "frequency": 1,
-        "reward": 750,
+        "reward": 900,
         "script": "bots/scripts/heavy.bot",
         "health": 9,
         "minWave":13

@@ -1,2 +1,19 @@
 # kites stay as far away from enemies as possible and
 # shoot at them with their sniper rifle
+
+if FIRST_CALL
+    num $kiteDist = 280
+    sniper.fire = True
+    sniper.direction = enemy.nearest.reldir
+endif
+else
+    num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+    if enemyDist < $kiteDist
+        move.direction = enemy.nearest.reldir
+        move.speed = ^1
+    endif
+    else
+        move.speed = 0.5
+        move.direction = enemy.nearest.reldir + (pi/2)
+    endelse
+endelse

@@ -10,20 +10,42 @@ if FIRST_CALL
     #timing stuff
     num $totalCalls = 1 
     num $dTimeSum = 0 #total time elapsed
+    num $kiteDistance = 70
+    bool $wasEnemies = True
 endif
 
 #normal loop case
 else 
-    #movement
-    move.direction = move.direction + ((2*pi*D_TIME)/10)
-
-    #track total calls
-    $totalCalls = $totalCalls+1
-    
-    #only shoot every other second
-    if ((round:$dTimeSum) % 2) == 0 #test comment, this shouldn't crash
-        minigun.fire = False # test comment#2
+    if enemy.count > 0
+        minigun.fire = True
+        #movement
+        #move.direction = move.direction + ((2*pi*D_TIME)/10)
+        move.direction = enemy.nearest.reldir
+        move.speed = 1
+        #track total calls
+        $totalCalls = $totalCalls+1
+        
+        #only shoot every other second
+        if ((round:$dTimeSum) % 2) == 0 #test comment, this shouldn't crash
+            minigun.fire = False # test comment#2
+        endif
+        $wasEnemies = True
     endif
+    else
+        if $wasEnemies
+            move.speed = ((rand:16)+1)/16
+            $kiteDistance = 30 + rand:80
+            $wasEnemies = False
+        endif
+        minigun.fire=False
+        num objDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+        if objDist > $kiteDistance + 3
+            move.direction = objective.reldir
+        endif
+        else
+            move.direction = objective.reldir + (pi/2)
+        endelse
+    endelse
 endelse
 
 #log average script calls per second

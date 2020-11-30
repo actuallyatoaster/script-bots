@@ -1,1 +1,3 @@
 #slicers circle rapidly around the objective and shoot it
+
+move.direction = 1

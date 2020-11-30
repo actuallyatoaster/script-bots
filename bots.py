@@ -16,8 +16,9 @@ def getClosestBot(pos, bots):
     nearestDist = None
     for bot in bots:
         d = pointDistance(pos[0], pos[1], bot.pos[0], bot.pos[1])
-        if  nearestDist == None or d < nearest:
+        if nearestDist == None or d < nearestDist:
             nearest = bot
+            nearestDist = d
     return nearest, nearestDist
 
 #Take a tuple position and ensure its with 0 and the point bounds
@@ -47,7 +48,7 @@ def cleanseLocals(locs):
 
 class Bot():
 
-    def __init__(self, arena, equipment, script, collisionRadius, position, health, speed):
+    def __init__(self, arena, equipment, script, collisionRadius, position, health, speed, isEnemy=False, reward = 0):
         self.arena = arena
         self.equipment = equipment
         for eq in self.equipment:
@@ -61,6 +62,9 @@ class Bot():
         self.speed = speed
         #D_TIME for updates
         self.lastTime = time.time()
+        self.reward = reward
+
+        self.isEnemy = isEnemy
         #Set up environment externals
         self.env.externals = getEquipmentExternals(self.equipment)
         self.env.externals["move.speed"] = scriptables.ScriptNumber(0)
@@ -75,15 +79,22 @@ class Bot():
         self.env.constants["objective.x"] = scriptables.ScriptNumber(self.arena.objective.pos[0])
         self.env.constants["objective.y"] = scriptables.ScriptNumber(self.arena.objective.pos[1])
 
-    
+        self.env.constants["enemy.nearest.x"] = scriptables.ScriptNumber(0)
+        self.env.constants["enemy.nearest.y"] = scriptables.ScriptNumber(0)
+        self.env.constants["enemy.nearest.reldir"] = scriptables.ScriptNumber(0)
+        self.env.constants["enemy.nearest.move.direction"] = scriptables.ScriptNumber(0)
+        self.env.constants["enemy.nearest.move.speed"] = scriptables.ScriptNumber(0)
+        self.env.constants["objective.reldir"] = scriptables.ScriptNumber(0)
+
     def updateScriptConstants(self, enemyBots):
         self.env.constants["bot.x"] = scriptables.ScriptNumber(self.pos[0])
         self.env.constants["bot.y"] = scriptables.ScriptNumber(self.pos[1])
         self.env.constants["objective.health"] = scriptables.ScriptNumber(self.arena.objective.health)
         self.env.constants["D_TIME"] = scriptables.ScriptNumber(time.time() - self.lastScriptUpdate)
-        self.env.constants["enemy.count"] = len(enemyBots)
+        self.env.constants["enemy.count"] = scriptables.ScriptNumber(len(enemyBots))
         if len(enemyBots) > 0:
             nearest, nearestDist = getClosestBot(self.pos, enemyBots)
+            #print(nearest)
             self.env.constants["enemy.nearest.x"] = \
                 scriptables.ScriptNumber(nearest.pos[0])
             self.env.constants["enemy.nearest.y"] = \
@@ -91,6 +102,14 @@ class Bot():
             self.env.constants["enemy.nearest.reldir"] = \
                 scriptables.ScriptNumber(math.atan2(-1*(nearest.pos[1] - self.pos[1]),
                                          nearest.pos[0] - self.pos[0]))
+        
+            self.env.constants["enemy.nearest.move.direction"] = scriptables.ScriptNumber(
+                nearest.env.externals["move.direction"].value
+            )
+            self.env.constants["enemy.nearest.move.speed"] = scriptables.ScriptNumber(
+                nearest.env.externals["move.speed"].value * nearest.speed
+            )   
+        
         self.env.constants["objective.reldir"] = \
             scriptables.ScriptNumber(math.atan2(-1*(self.arena.objective.pos[1] - self.pos[1]),
                                          self.arena.objective.pos[0] - self.pos[0]))
@@ -109,14 +128,14 @@ class Bot():
             self.env.constants["FIRST_CALL"] = scriptables.ScriptBoolean(False) 
 
         #Update weapons
-        isEnemy = self in self.arena.enemyBots
+        
         for eq in self.equipment:
             #self.externals = {"direction":0, "fire":True}
             eq.update(self.env.externals)
             for projectile in eq.projectiles:
                 #Don't friendly fire the objective!
                 projectile.update(app, (enemyBots + [self.arena.objective] if 
-                    isEnemy else enemyBots))
+                    self.isEnemy else enemyBots))
                     # ie don't include the objective in list of potential collisions
                     # if you're a friendly bot
         #Update movement
@@ -134,9 +153,14 @@ class Bot():
         self.lastTime = time.time()
     def draw(self, app, canvas):
         #Draw bot itself
-        canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
-                           self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                           fill = "blue")
+        if self.isEnemy:
+            canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
+                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
+                            fill = "orange")
+        else:
+            canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
+                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
+                            fill = "blue")
 
         #draw health
         canvas.create_text(self.pos[0], self.pos[1]- 5, text=f"{self.health}")
@@ -144,7 +168,9 @@ class Bot():
         self.health -= dmg
         if self.health <= 0:
             if self in self.arena.friendlyBots: self.arena.friendlyBots.remove(self)
-            elif self in self.arena.enemyBots: self.arena.enemyBots.remove(self)
+            elif self in self.arena.enemyBots: 
+                self.arena.enemyBots.remove(self)
+                self.arena.money += self.reward
 
 
 class Projectile():

@@ -1,6 +1,7 @@
 import bots
 import loader
-from cmu_112_graphics import * #From https://www.cs.cmu.edu/~112/notes/cmu_112_graphics.py
+import time
+
 '''
 This file defines the arena environment
 ''' 
@@ -8,12 +9,29 @@ This file defines the arena environment
 
 class Arena():
     def __init__(self, dims):
+        self.wave = 0
+        self.waveInterval = 10
+        self.endOfLastWave = 0
+        self.waveStarted = False
+
         self.dims = dims
         self.friendlyBots = []
         self.enemyBots = []
         self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 500)
+        self.money = 1000
 
     def update(self, app):
+
+        if len(self.enemyBots) == 0 and self.waveStarted:
+            self.waveStarted = False
+            self.endOfLastWave = time.time()
+            self.money += 200 * self.wave
+
+        elif ((not self.waveStarted) and time.time() > self.endOfLastWave + self.waveInterval):
+            self.waveStarted = True
+            self.wave += 1
+            loader.createEnemyWave(self, self.wave)
+
         for bot in self.friendlyBots:
             bot.update(app, self.enemyBots)
 
@@ -36,36 +54,18 @@ class Arena():
             fill="white", width=0)
         canvas.create_rectangle(0, self.dims[1], app.height, app.width, 
             fill="white", width=0)
+
+        self.createArenaStats(app, canvas)
         
-
-
-#####Temp stuff!!!!!
-
-def appStarted(app):
-    #Want everything as smooth as possible, all the other timing is manual anyway
-    app.timerDelay = 1
-    app.arenaWidth , app.arenaHeight = 500,500
-    app.arena = Arena((500,500))
-    
-    for i in range(100):
-        bot = loader.createBotFromFile("demo", app.arena, (i*50,i*20+200), typeFile="bots/bots.json")
-        app.arena.friendlyBots.append(bot)
-    for i in range(10000):
+    def createArenaStats(self, app, canvas, margin=20):
+        canvas.create_text(self.dims[1]+ margin, margin, anchor='nw',
+            font = 'Arial 24 bold', text = f"Wave {self.wave}")
+        coolDownOffset = 35
+        timeRemaining = round(self.endOfLastWave + self.waveInterval - time.time())
+        if not self.waveStarted:
+            canvas.create_text(self.dims[1]+ margin, margin + coolDownOffset, anchor='nw',
+                font = 'Arial 18', text = f"Next wave in {timeRemaining}")
         
-        pos = ((500//20) * i, (500//20) * i)
-        if i > 30:
-            bot2 = loader.createBotFromFile("grunt", app.arena, pos)
-        else:
-            bot2 = loader.createBotFromFile("heavy", app.arena, pos)
-        app.arena.enemyBots.append(bot2)
-
-    
-    
-
-def timerFired(app):
-    app.arena.update(app)
-
-def redrawAll(app, canvas):
-    app.arena.draw(app, canvas)
-
-runApp(width=700, height=700)
+        moneyOffset = coolDownOffset + 45
+        canvas.create_text(self.dims[1]+ margin, margin + moneyOffset, anchor='nw',
+            font = 'Arial 18', text = f"Money: ${self.money}")

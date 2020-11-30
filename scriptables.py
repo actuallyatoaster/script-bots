@@ -592,6 +592,7 @@ class ScriptEnvironment():
     #Execute the next line
     def executeNext(self):
         try:
+            #print(self.lines[self.instructionIndex])
             self.instructionIndex = self.executeStep(self.lines[self.instructionIndex],
                                     self.instructionIndex)
             #input()

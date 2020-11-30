@@ -3,7 +3,7 @@
         "standard":{
             "displayName": "Standard Gun",
             "scriptName": "standard",
-            "projectileSpeed": 100,
+            "projectileSpeed": 170,
             "fireRate": 5,
             "spritePath": "",
             "damage": 4,
@@ -36,7 +36,7 @@
         "minigun": {
             "displayName": "Minigun",
             "scriptName": "minigun",
-            "projectileSpeed": 120,
+            "projectileSpeed": 140,
             "fireRate": 20,
             "spritePath": "",
             "damage": 2,
