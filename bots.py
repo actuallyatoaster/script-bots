@@ -28,7 +28,7 @@ def boundPosition(pos, bounds):
     newX = max(0, newX)
     newX = min(newX, bounds[0])
     newY = max(0, newY)
-    newU = min(newY, bounds[1])
+    newY = min(newY, bounds[1])
     return newX, newY
 
 
