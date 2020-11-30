@@ -16,4 +16,5 @@ else
         move.speed = 0.5
         move.direction = enemy.nearest.reldir + (pi/2)
     endelse
+    sniper.direction = enemy.nearest.reldir
 endelse

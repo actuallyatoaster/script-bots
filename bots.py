@@ -22,13 +22,13 @@ def getClosestBot(pos, bots):
     return nearest, nearestDist
 
 #Take a tuple position and ensure its with 0 and the point bounds
-def boundPosition(pos, bounds):
+def boundPosition(pos, bounds, margin=0):
     newX = pos[0]
     newY = pos[1]
-    newX = max(0, newX)
-    newX = min(newX, bounds[0])
-    newY = max(0, newY)
-    newY = min(newY, bounds[1])
+    newX = max(margin, newX)
+    newX = min(newX, bounds[0]-margin)
+    newY = max(margin, newY)
+    newY = min(newY, bounds[1]-margin)
     return newX, newY
 
 
@@ -148,7 +148,8 @@ class Bot():
 
         newPos = (self.pos[0] + self.speed*xVel*dTime,
                     self.pos[1] + self.speed*yVel*dTime)
-        self.pos = boundPosition(newPos, self.arena.dims)
+        self.pos = boundPosition(newPos, self.arena.dims, 
+                margin=self.collisionRadius+app.botBoundsMargin)
 
         self.lastTime = time.time()
     def draw(self, app, canvas):
@@ -156,14 +157,14 @@ class Bot():
         if self.isEnemy:
             canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
                             self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                            fill = "orange")
+                            fill = "orange",width=0)
         else:
             canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
                             self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                            fill = "blue")
+                            fill = "blue", width=0)
 
         #draw health
-        canvas.create_text(self.pos[0], self.pos[1]- 5, text=f"{self.health}")
+        canvas.create_text(self.pos[0], self.pos[1]- 10, text=f"{self.health}")
     def damage(self, dmg):
         self.health -= dmg
         if self.health <= 0:
@@ -219,7 +220,7 @@ class Projectile():
     def draw(self, app, canvas):
         canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                           fill = "red")
+                           fill = "red", width=0)
         
 
 class Equipment():
@@ -258,6 +259,6 @@ class Objective(Bot): #Objectives are just bots that don't do anything
 
     def draw(self, canvas):
         canvas.create_rectangle(self.pos[0] - self.size/2, self.pos[1] - self.size/2,
-            self.pos[0]+self.size/2, self.pos[1] + self.size/2, fill="purple")
+            self.pos[0]+self.size/2, self.pos[1] + self.size/2, fill="purple", width=0)
 
-        canvas.create_text(self.pos[0], self.pos[1]- 5, text=f"{self.health}")
+        canvas.create_text(self.pos[0], self.pos[1], text=f"{self.health}")

@@ -30,7 +30,7 @@
         "weapons":[
             "sniper"
         ],
-        "frequency": 2000,
+        "frequency": 2,
         "reward": 500,
         "script": "bots/scripts/kite.bot",
         "health": 1,
