@@ -28,7 +28,7 @@
             "projectileSpeed": 1000,
             "fireRate": 2,
             "spritePath": "",
-            "damage": 15,
+            "damage": 13,
             "projColRad": 2,
             "cost": 800
         },
@@ -36,12 +36,23 @@
         "minigun": {
             "displayName": "Minigun",
             "scriptName": "minigun",
-            "projectileSpeed": 140,
+            "projectileSpeed": 160,
             "fireRate": 20,
             "spritePath": "",
             "damage": 2,
             "projColRad": 2,
             "cost": 900
+        },
+
+        "laser":{
+            "displayName": "Laser",
+            "scriptName": "laser",
+            "projectileSpeed": 2000,
+            "fireRate": 1000000,
+            "spritePath": "",
+            "damage": 0.25,
+            "projColRad": 3,
+            "cost": 9000
         }
     },
 

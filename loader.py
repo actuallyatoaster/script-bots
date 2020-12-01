@@ -17,10 +17,21 @@ def loadWeapon(name, arena):
 
     return bots.Equipment(sName, projSpeed,  fireRate, texture, damage, rad)
 
-def calculateBotCost(name):
-    pass
+def calculateBotCost(name, typeFile = 'bots/enemies.json', baseCost=350):
+    botJson = loadJsonFromFile(typeFile)[name]
+    costSum = baseCost
+    eqJson = loadJsonFromFile('bots/equipment.json')
+    for weapon in botJson["weapons"]:
+        costSum += eqJson["weapons"][weapon]["cost"]
+    
+    for buff in botJson["buffs"]:
+        costSum += eqJson["buffs"][buff]["cost"]
+    
+    return costSum
 
-def createBotFromFile(name, arena, position, baseHealth = 25, baseColRad=5, baseSpeed = 75, typeFile = "bots/enemies.json", isEnemy=False):
+
+
+def createBotFromFile(name, arena, position, baseHealth = 60, baseColRad=5, baseSpeed = 75, typeFile = "bots/enemies.json", isEnemy=False):
     #Need: arena, equipment, script, colRad, position, health, speed
     botJson = loadJsonFromFile(typeFile)[name]
     #TODO: speed buffs

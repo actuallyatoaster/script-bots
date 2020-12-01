@@ -24,6 +24,8 @@ class Arena():
         self.sidebar = self.buildSidebar()
         self.bottomBar = self.buildBottomBar()
 
+        self.bottomBar.add(BotContainer(0,self.dims[1],"demo", True))
+
     def update(self, app):
 
         if len(self.enemyBots) == 0 and self.waveStarted:
@@ -64,10 +66,10 @@ class Arena():
         canvas.create_rectangle(0,0, self.dims[0], self.dims[1], fill="grey")
 
         for bot in self.friendlyBots + self.enemyBots:
-            bot.draw(app, canvas)
             for eq in bot.equipment:
                 for projectile in eq.projectiles:
                     projectile.draw(app, canvas)
+            bot.draw(app, canvas)
 
         self.objective.draw(canvas)
 
@@ -84,6 +86,20 @@ class Arena():
     def onClick(self, app, event):
         self.sidebar.onClick(app, event)
         self.bottomBar.onClick(app, event)
+
+        #Create purchased bot and remove money
+        if app.substate == "PURCHASE":
+            if event.x <= app.arenaWidth and event.y <= app.arenaHeight:
+                newBot = loader.createBotFromFile(app.selectedBot, self,
+                    (event.x, event.y), typeFile = 'bots/bots.json')
+                self.friendlyBots.append(newBot)
+
+                self.money -= loader.calculateBotCost(app.selectedBot,
+                    typeFile = 'bots/bots.json')
+                app.substate = "DEFAULT"
+                app.selectedBot = None
+                app.toast = None
+
     
     def buildSidebar(self, vertOffset = 120,margin = 20):
         container = UIElems.UIContainer(self.dims[0], vertOffset)
@@ -104,13 +120,71 @@ class Arena():
             font = 'Arial 24 bold', text = f"Wave {self.wave}")
         coolDownOffset = 35
         timeRemaining = round(app.pausedTime + self.endOfLastWave + self.waveInterval - time.time())
-        if not self.waveStarted:
+        if not self.waveStarted and timeRemaining > 0:
             canvas.create_text(self.dims[1]+ margin, margin + coolDownOffset, anchor='nw',
                 font = 'Arial 18', text = f"Next wave in {timeRemaining}")
         
         moneyOffset = coolDownOffset + 45
         canvas.create_text(self.dims[1]+ margin, margin + moneyOffset, anchor='nw',
             font = 'Arial 18', text = f"Money: ${self.money}")
+
+#Buttons that appear for each bot in the bottom bar
+class BotContainer(UIElems.UIContainer):
+    def __init__(self, x, y, botName, exists, margin=20):
+        super().__init__(x,y)
+        self.exists = exists
+        self.label = botName
+        self.margin = margin
+        #BotContainer should be a 200x140 rectangle
+        width, height= 140, 200
+
+        #Make edit and purchase buttons
+        editButton = BotEditButton(margin, height-margin-30, botName)
+        purchaseButton = BotPurchaseButton(2*margin+editButton.width,
+                height-margin-30, botName)
+        self.add(editButton)
+        self.add(purchaseButton)
+
+    
+    def draw(self, app, canvas):
+        super().draw(app, canvas)
+        posX, posY = self.positionOffset()
+        #Make label
+        canvas.create_text(posX + self.margin, posY + self.margin,
+            text=self.label, anchor='nw', font = "Helvetica 16 bold")
+        #Draw bot icon and text here
+
+class BotEditButton(UIElems.UIButton):
+
+    def __init__(self, x, y, botName):
+        super().__init__(x,y, 60, 30, label="Edit")
+        self.botName = botName
+    
+    def onClick(self, app):
+        app.state = "EDITOR"
+        app.selectedBot = self.botName
+
+class BotPurchaseButton(UIElems.UIButton):
+    def __init__(self, x, y, botName):
+        super().__init__(x, y, 60, 30, label="Buy")
+        self.botName = botName
+
+    def onClick(self, app):
+        #Let user place new bot if there's sufficient money
+        if app.arena.money < loader.calculateBotCost(self.botName, 
+                typeFile = 'bots/bots.json'):
+            app.toastTime = time.time()
+            app.toast = "Not enough money!"
+            app.toastColor = "red"
+
+        else: 
+            app.substate = "PURCHASE"
+            app.selectedBot = self.botName
+
+            app.toastTime = time.time()*2 #This should be long enough to keep it permanently
+            app.toast = f"Click to place {self.botName}"
+            app.toastColor = "blue"
+            
 
 class PauseButton(UIElems.UIButton):
     def __init__(self, x,y):
@@ -128,5 +202,3 @@ class ResumeButton(UIElems.UIButton):
     
     def onClick(self, app):
         if app.paused: app.arena.resume(app)
-        
-    
