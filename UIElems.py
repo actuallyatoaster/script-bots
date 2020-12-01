@@ -76,3 +76,60 @@ class UIButton():
     def onClick(self, app):
         print(f"Button {self.label} clicked.")
 
+class UICheckbox(UIButton):
+    def __init__(self, x, y, width, height, checked=False):
+        super().__init__(x,y,width,heigh)
+        self.checked = checked
+    
+    def onClick(self, app):
+        if self.checked:
+            self.checked = False
+            self.container.checked = False
+            self.onUnCheck(app)
+        else:
+            self.checked = True
+            self.container.checked = True
+            self.onCheck(app)
+
+    def draw(self, app, canvas):
+        containerX, containerY = self.container.positionOffset()
+        #position is relative to container
+        bX = self.x + containerX
+        bY = self.y + containerY
+
+        canvas.create_rectangle(bX, bY, bX + self.width, bY + self.height,
+            fill="white", width="2")
+
+        if self.checked:
+            cx, cy = bX + self.width/2, bY + self.height/2
+            r = min(self.width, self.height)/2
+            canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="blue", width=0)
+    #Subclasses should make these functions do stuff
+    def onCheck(self, app):
+        pass
+
+    def onUnCheck(self, app):
+        pass
+
+    
+
+class UILabeledCheckbox(UIContainer):
+    def __init__(self, x, y, label, checked=False, boxSize = 7, margin = 3):
+        super().__init__(x,y)
+        self.checked = checked
+        self.boxSize = boxSize
+        self.margin = margin
+        self.label=label
+
+        checkButton = 
+
+    
+    def draw(self, app, canvas):
+        super().draw(app, canvas)
+        posX, posY = self.positionOffset()
+        #draw the label
+        canvas.create_text(posX-self.margin, posY, posX-self.margin+self.boxSize,
+            posY+self.boxSize, text=self.label, font="Helvetica 14")
+
+
+    

@@ -1,0 +1,12 @@
+# Write your script here!
+# If you don't know how, look at botscript_docs.txt
+
+if FIRST_CALL
+    #Initialize any variables here, only called once
+
+endif
+else
+    #Define how your bot will behave here (called about 20 times/sec)
+    move.direction = move.direction + (pi * D_TIME)
+    move.speed = 1
+endelse

@@ -1,10 +1,42 @@
 {
-    "demo":{
+    "user-bot1":{
         "displayName":"Demo",
         "buffs": [],
         "weapons":[
             "minigun"
         ],
-        "script": "bots/scripts/demo.bot"
+        "script": "bots/scripts/user-bot1.bot"
+    },
+    "user-bot2":{
+        "displayName":"Bot 2",
+        "buffs": [],
+        "weapons":[
+            "standard"
+        ],
+        "script": "bots/scripts/user-bot2.bot"
+    },
+    "user-bot3":{
+        "displayName":"Bot 3",
+        "buffs": [],
+        "weapons":[
+            "standard"
+        ],
+        "script": "bots/scripts/user-bot3.bot"
+    },
+    "user-bot4":{
+        "displayName":"Bot 4",
+        "buffs": [],
+        "weapons":[
+            "standard"
+        ],
+        "script": "bots/scripts/user-bot4.bot"
+    },
+    "user-bot5":{
+        "displayName":"Bot 5",
+        "buffs": [],
+        "weapons":[
+            "standard"
+        ],
+        "script": "bots/scripts/user-bot5.bot"
     }
 }

@@ -24,7 +24,7 @@ class Arena():
         self.sidebar = self.buildSidebar()
         self.bottomBar = self.buildBottomBar()
 
-        self.bottomBar.add(BotContainer(0,self.dims[1],"demo", True))
+        
 
     def update(self, app):
 
@@ -112,7 +112,14 @@ class Arena():
         return container
     
     def buildBottomBar(self):
-        return UIElems.UIContainer(0,0)
+        bottomBar = UIElems.UIContainer(0, self.dims[1])
+        botContainerWidth = 140
+
+        for userBotID in range(5):
+            bottomBar.add(BotContainer(botContainerWidth * userBotID, 0,
+                f"user-bot{userBotID+1}", True))
+
+        return bottomBar
     
         
     def createArenaStats(self, app, canvas, margin=20):
@@ -130,7 +137,7 @@ class Arena():
 
 #Buttons that appear for each bot in the bottom bar
 class BotContainer(UIElems.UIContainer):
-    def __init__(self, x, y, botName, exists, margin=20):
+    def __init__(self, x, y, botName, exists, margin=15):
         super().__init__(x,y)
         self.exists = exists
         self.label = botName
@@ -144,29 +151,52 @@ class BotContainer(UIElems.UIContainer):
                 height-margin-30, botName)
         self.add(editButton)
         self.add(purchaseButton)
+        self.refresh()
+        self.botSize = 5 #Only for icon
+        self.botDisplayName = loader.loadJsonFromFile("bots/bots.json")[botName]["displayName"]
 
+    def refresh(self):
+        self.cost = loader.calculateBotCost(self.label, typeFile = 'bots/bots.json')
     
     def draw(self, app, canvas):
         super().draw(app, canvas)
         posX, posY = self.positionOffset()
         #Make label
         canvas.create_text(posX + self.margin, posY + self.margin,
-            text=self.label, anchor='nw', font = "Helvetica 16 bold")
-        #Draw bot icon and text here
+            text=self.botDisplayName, anchor='nw', font = "Helvetica 16 bold")
+        
+        #Show price
+        canvas.create_text(posX + self.margin, posY + self.margin*2,
+            text=f"${self.cost}", anchor = 'nw', font = "Helvetica 13")
+        
+        #Show "picture"
+        cx = posX + 140/2
+        cy = posY + 200/2
+        scale = 3
+        canvas.create_oval(cx - scale*self.botSize, cy - scale*self.botSize,
+            cx+scale*self.botSize, cy+scale*self.botSize, fill = "blue", 
+            width=0)
+
 
 class BotEditButton(UIElems.UIButton):
 
     def __init__(self, x, y, botName):
-        super().__init__(x,y, 60, 30, label="Edit")
+        super().__init__(x,y, 40, 30, label="Edit")
         self.botName = botName
     
     def onClick(self, app):
         app.state = "EDITOR"
         app.selectedBot = self.botName
 
+        #Pause the game
+        if not app.paused:
+            app.paused = True
+            app.pauseStart = time.time()
+            app.pausedTime = 0
+
 class BotPurchaseButton(UIElems.UIButton):
     def __init__(self, x, y, botName):
-        super().__init__(x, y, 60, 30, label="Buy")
+        super().__init__(x, y, 40, 30, label="Buy")
         self.botName = botName
 
     def onClick(self, app):

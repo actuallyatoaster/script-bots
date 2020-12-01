@@ -164,7 +164,7 @@ class Bot():
                             fill = "blue", width=0)
 
         #draw health
-        canvas.create_text(self.pos[0], self.pos[1]- 10, text=f"{self.health}")
+        canvas.create_text(self.pos[0], self.pos[1]- 10, text=f"{int(self.health)}")
     def damage(self, dmg):
         self.health -= dmg
         if self.health <= 0:
