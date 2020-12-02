@@ -83,13 +83,28 @@ def createEnemyWave(arena, amount):
         newBot = createRandomEnemy(arena, botPosition)
         arena.enemyBots.append(newBot)
 
-def loadJsonFromFile(path, cache=dict()):
-    if path in cache: #This abuses the fact that the dict acts like a global variable
-        return cache[path]
+#Returns weapons, buffs
+# Where each is a list of 3-tuples taking the form
+# (name, Display Name, Cost)
+def makeEquipmentList():
+    equipmentJson = loadJsonFromFile('bots/equipment.json')
+    weapons, buffs = [], []
+
+    for weapon in equipmentJson["weapons"]
+        weapons.append((weapon, equipmentJson["weapons"]["displayName"],
+            equipmentJson["weapons"]["cost"]))
+    
+    for buff in equipmentJson["buffs"]
+        buffs.append((buff, equipmentJson["buffs"]["displayName"],
+            equipmentJson["buffs"]["cost"]))
+    
+    return weapons, buffs
+
+
+def loadJsonFromFile(path):
 
     with open(path, 'r') as f:
         data = f.read()
     #print(data)
     parsed = json.loads(data)
-    cache[path] = parsed
     return parsed

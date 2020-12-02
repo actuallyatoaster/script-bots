@@ -2,6 +2,7 @@ from cmu_112_graphics import * #From https://www.cs.cmu.edu/~112/notes/cmu_112_g
 import arena
 import loader
 import time
+import editor
 
 def appStarted(app):
     app.state = "ARENA"
@@ -34,7 +35,7 @@ def timerFired(app):
 
 def redrawAll(app, canvas):
     if app.state == "ARENA":app.arena.draw(app, canvas)
-    elif app.state == "EDITOR": editor.draw(app, canvas)
+    elif app.state == "EDITOR": app.editor.draw(app, canvas)
 
     if app.toast and time.time() <= app.toastTime + app.toastDelay:
         canvas.create_text(10,10, anchor = 'nw', text=app.toast,\
@@ -43,7 +44,7 @@ def redrawAll(app, canvas):
 
 def mousePressed(app, event):
     if app.state == "ARENA":app.arena.onClick(app, event)
-    elif app.state == "EDITOR": editor.mousePressed(app, event)
+    elif app.state == "EDITOR": app.editor.onClick(app, event)
 
 
 runApp(width=700, height=700)

@@ -2,6 +2,7 @@ import bots
 import loader
 import time
 import UIElems
+import editor
 
 '''
 This file defines the arena environment
@@ -186,7 +187,7 @@ class BotEditButton(UIElems.UIButton):
     
     def onClick(self, app):
         app.state = "EDITOR"
-        app.selectedBot = self.botName
+        app.editor = editor.Editor(self.botName)
 
         #Pause the game
         if not app.paused:

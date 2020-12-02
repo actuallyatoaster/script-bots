@@ -6,12 +6,30 @@ It more or less functions like a standalone app
 import UIElems
 import loader
 
-def appStarted(app):
-    app.editorContainer = UIElems.UIContainer(0,0)
+class Editor():
+    def __init__(self, bot, margin=20):
+        self.bot = bot
+        self.botJson = loader.loadJsonFromFile("bots/bots.json")[bot]
+        
+        self.margin = margin
+        self.container = UIElems.UIContainer(margin,margin)
 
-def redrawAll(app):
+        self.container.add(UIElems.UILabeledCheckbox(10,10, "label"))
 
-def mousePressed(event):
+        #Create UI for weapons
+
+    def draw(self, app, canvas):
+        self.container.draw(app, canvas)
+
+    def onClick(self, app, event):
+        self.container.onClick(app, event)
+
+class EquipmentCheckbox(UIElems.UILabeledCheckbox):
+    #Equipment is a tuple of the form (name, display name, cost)
+    def __init__(x, y, equipment, bot):
+        self.eqName, self.eqLabel, self.eqCost = equipment
+        super().__init__(x,y, f"{self.eqLabel}: ${self.eqCost}")
+        
 
 class backButton(UIElems.UIButton):
     def onClick(app):
