@@ -19,7 +19,7 @@
             "spritePath": "",
             "damage": 8,
             "projColRad": 5,
-            "cost": 500
+            "cost": 1000
         },
 
         "sniper": {
@@ -41,7 +41,7 @@
             "spritePath": "",
             "damage": 2,
             "projColRad": 2,
-            "cost": 900
+            "cost": 600
         },
 
         "laser":{

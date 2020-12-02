@@ -17,8 +17,9 @@ def loadWeapon(name, arena):
 
     return bots.Equipment(sName, projSpeed,  fireRate, texture, damage, rad)
 
-def calculateBotCost(name, typeFile = 'bots/enemies.json', baseCost=350):
-    botJson = loadJsonFromFile(typeFile)[name]
+def calculateBotCost(name, typeFile = 'bots/enemies.json', baseCost=350, botJson=None):
+    if botJson == None:
+        botJson = loadJsonFromFile(typeFile)[name]
     costSum = baseCost
     eqJson = loadJsonFromFile('bots/equipment.json')
     for weapon in botJson["weapons"]:
@@ -90,16 +91,20 @@ def makeEquipmentList():
     equipmentJson = loadJsonFromFile('bots/equipment.json')
     weapons, buffs = [], []
 
-    for weapon in equipmentJson["weapons"]
-        weapons.append((weapon, equipmentJson["weapons"]["displayName"],
-            equipmentJson["weapons"]["cost"]))
+    for weapon in equipmentJson["weapons"]:
+        weapons.append((weapon, equipmentJson["weapons"][weapon]["displayName"],
+            equipmentJson["weapons"][weapon]["cost"]))
     
-    for buff in equipmentJson["buffs"]
-        buffs.append((buff, equipmentJson["buffs"]["displayName"],
-            equipmentJson["buffs"]["cost"]))
+    for buff in equipmentJson["buffs"]:
+        buffs.append((buff, equipmentJson["buffs"][buff]["displayName"],
+            equipmentJson["buffs"][buff]["cost"]))
     
     return weapons, buffs
 
+def botHasEquipment(botName, equipmentName, typeFile='bots/bots.json'):
+    fileJson = loadJsonFromFile(typeFile)
+    return(equipmentName in fileJson[botName]["weapons"] or
+           equipmentName in fileJson[botName]["buffs"])
 
 def loadJsonFromFile(path):
 

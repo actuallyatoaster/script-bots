@@ -122,8 +122,8 @@ class UILabeledCheckbox(UIContainer):
         self.margin = margin
         self.label=label
 
-        checkButton = UICheckbox(0, 0, boxSize, boxSize, checked=checked)
-        self.add(checkButton)
+        self.checkButton = UICheckbox(0, 0, boxSize, boxSize, checked=checked)
+        self.add(self.checkButton)
 
     
     def draw(self, app, canvas):
@@ -132,6 +132,3 @@ class UILabeledCheckbox(UIContainer):
         #draw the label
         canvas.create_text(posX+self.margin+self.boxSize, posY-self.margin+3, 
             text=self.label, font="Helvetica 14", anchor = 'nw')
-
-
-    
