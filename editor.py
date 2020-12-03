@@ -2,6 +2,9 @@
 This file defines the editor that opens when the player edits a bot.
 It more or less functions like a standalone app
 '''
+import subprocess, os, platform #This is just for opening the file in default program,
+# From: https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+
 
 import UIElems
 import loader
@@ -32,8 +35,15 @@ class Editor():
             box = EquipmentCheckbox(self.horzOffset, self.titleOffset + self.checkMargin*i, 
             buff, self.bot, checked=checked)
             self.container.add(box)
+        
+        buttonsOffset = 2.5*self.titleOffset + max(len(self.weapons), len(self.buffs))*self.checkMargin
 
+        scriptEditButton = ScriptEditButton(0, buttonsOffset, 80, 30, "Open Script")
+        self.container.add(scriptEditButton)
+
+        backButton = BackButton(0, buttonsOffset+scriptEditButton.height + self.margin, 60, 30, "Back")
         self.totalCost = loader.calculateBotCost(self.bot, typeFile = 'bots/bots.json')
+        self.container.add(backButton)
 
     def draw(self, app, canvas):
         self.container.draw(app, canvas)
@@ -84,19 +94,38 @@ class EquipmentCheckbox(UIElems.UILabeledCheckbox):
 
         
 
-class backButton(UIElems.UIButton):
-    def onClick(app):
+class BackButton(UIElems.UIButton):
+    def onClick(self, app):
+        loader.saveBotToFile(app.editor.bot, app.editor.botJson)
+
         app.state = "ARENA"
-        app.arena.resume()
-        for botContainer in app.arena.bottomBar:
+        app.arena.resume(app)
+        for botContainer in app.arena.bottomBar.elems:
             botContainer.refresh()
 
-        #TODO:Write bot changes to file...
+        
 
-class scriptEditButton(UIElems.UIButton):
-    def onClick(app):
+class ScriptEditButton(UIElems.UIButton):
+    def onClick(self, app):
+        #openFileInDefaultProgram(app.editor.bot)
         pass
 
-def openFileInDefaultProgram(path):
-    #From https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
-    pass
+    def draw(self, app, canvas):
+        containerX, containerY = self.container.positionOffset()
+        #position is relative to container
+        bX = self.x + containerX
+        bY = self.y + containerY
+
+        canvas.create_text(bX, bY, anchor='nw', font="Arial 16", 
+        text=f"Edit your bot's script by opening the file bots/scripts/{app.editor.bot}.bot")
+
+#def openFileInDefaultProgram(path):
+ #   filepath = f"{os.getcwd()}{os.sep}bots{os.sep}scripts{os.sep}{path}.bot"
+  #  #From https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+   # #I did not write anything below this point
+    #if platform.system() == 'Darwin':       # macOS
+     #   subprocess.call(('open', filepath))
+    #elif platform.system() == 'Windows':    # Windows
+     #   os.startfile(filepath)
+    #else:                                   # linux variants
+     #   subprocess.call(('xdg-open', filepath))

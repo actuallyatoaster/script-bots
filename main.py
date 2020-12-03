@@ -4,6 +4,7 @@ import loader
 import time
 import editor
 
+
 def appStarted(app):
     app.state = "ARENA"
     app.substate = "DEFAULT" #Used to track when player is creating new bot

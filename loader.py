@@ -53,6 +53,17 @@ def createBotFromFile(name, arena, position, baseHealth = 60, baseColRad=5, base
 
     return newBot
 
+def saveBotToFile(bot, botJson, typeFile = 'bots/bots.json'):
+    fileJson = loadJsonFromFile(typeFile)
+    fileJson[bot] = botJson
+    jsonStr = json.dumps(fileJson, indent=4)
+
+    with open(typeFile, 'w') as f:
+        f.write(jsonStr)
+        print("wrote to file")
+        f.close()
+
+
 def createRandomEnemy(arena, position):
     enemyData = loadJsonFromFile('bots/enemies.json')#this would be bad if it weren't cached
     #sum up the frequencies of each bot, choose a number between
@@ -110,6 +121,7 @@ def loadJsonFromFile(path):
 
     with open(path, 'r') as f:
         data = f.read()
+        f.close()
     #print(data)
     parsed = json.loads(data)
     return parsed
