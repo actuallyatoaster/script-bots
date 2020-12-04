@@ -138,7 +138,7 @@ class Arena():
 
 #Buttons that appear for each bot in the bottom bar
 class BotContainer(UIElems.UIContainer):
-    def __init__(self, x, y, botName, exists, margin=15):
+    def __init__(self, x, y, botName, exists, margin=20):
         super().__init__(x,y)
         self.exists = exists
         self.label = botName
@@ -213,7 +213,7 @@ class BotPurchaseButton(UIElems.UIButton):
             app.selectedBot = self.botName
 
             app.toastTime = time.time()*2 #This should be long enough to keep it permanently
-            app.toast = f"Click to place {self.botName}"
+            app.toast = f"Click to place {loader.loadJsonFromFile('bots/bots.json')[self.botName]['displayName']}"
             app.toastColor = "blue"
             
 

@@ -48,7 +48,7 @@ def cleanseLocals(locs):
 
 class Bot():
 
-    def __init__(self, arena, equipment, script, collisionRadius, position, health, speed, isEnemy=False, reward = 0):
+    def __init__(self, arena, equipment, script, collisionRadius, position, health, speed, isEnemy=False, reward = 0, name="enemy"):
         self.arena = arena
         self.equipment = equipment
         for eq in self.equipment:
@@ -63,6 +63,7 @@ class Bot():
         #D_TIME for updates
         self.lastTime = time.time()
         self.reward = reward
+        self.name = name
 
         self.isEnemy = isEnemy
         #Set up environment externals
@@ -120,6 +121,7 @@ class Bot():
         
         #Do script updates
         if time.time() >= self.lastScriptUpdate + SCRIPT_UPDATE_SPEED:
+            app.errorBot = self.name
             #Inject new variables into script environment
             self.env.locs = cleanseLocals(self.env.locs)
             self.updateScriptConstants(enemyBots)

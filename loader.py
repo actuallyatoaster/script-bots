@@ -49,7 +49,8 @@ def createBotFromFile(name, arena, position, baseHealth = 60, baseColRad=5, base
         reward = botJson["reward"]
     else: reward = 0
 
-    newBot = bots.Bot(arena, equipment, script, baseColRad, position, baseHealth*mod, baseSpeed, isEnemy=isEnemy, reward=reward)
+
+    newBot = bots.Bot(arena, equipment, script, baseColRad, position, baseHealth*mod, baseSpeed, isEnemy=isEnemy, reward=reward,name=name )
 
     return newBot
 
