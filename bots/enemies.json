@@ -18,10 +18,10 @@
         "weapons":[
             "minigun"
         ],
-        "frequency": 4000,
+        "frequency": 4,
         "reward": 450,
         "script": "bots/scripts/slicer.bot",
-        "health": 0.3,
+        "health": 0.4,
         "minWave":2
     },
     "kite":{
