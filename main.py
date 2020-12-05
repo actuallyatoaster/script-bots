@@ -42,7 +42,7 @@ def appStarted(app):
     arena.bots.scriptables.scriptLog = scriptLog
 
     #Starting money
-    app.arena.money += 5000
+    app.arena.money += 4000
 
     #Initialize menu stuff
     menu.appStarted(app)
@@ -71,7 +71,7 @@ def redrawAll(app, canvas):
     if app.state == "ARENA":app.arena.draw(app, canvas)
     elif app.state == "EDITOR": app.editor.draw(app, canvas)
     elif app.state == "MENU": menu.redrawAll(app, canvas)
-
+    elif app.state == "GAMEOVER": menu.drawGameOver(app, canvas)
     if app.toast and time.time() <= app.toastTime + app.toastDelay:
         canvas.create_text(10,10, anchor = 'nw', text=app.toast,\
             fill=app.toastColor, font = "arial 16 bold")
@@ -81,6 +81,9 @@ def mousePressed(app, event):
     if app.state == "ARENA":app.arena.onClick(app, event)
     elif app.state == "EDITOR": app.editor.onClick(app, event)
     elif app.state == "MENU": menu.mousePressed(app, event)
+    elif app.state == "GAMEOVER":
+        appStarted(app)
+        app.state = "ARENA"
 
 
 runApp(width=700, height=700)

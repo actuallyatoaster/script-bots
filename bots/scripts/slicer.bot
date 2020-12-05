@@ -1,3 +1,27 @@
 #slicers circle rapidly around the objective and shoot it
 
-move.direction = 1
+if FIRST_CALL
+    move.speed = 1
+    num $orbitDist = 75 + (rand:50) #distance to orbit objective
+    num $defenseDist = 50 #if enemy within this distance, shoot it instead of objective
+endif
+else
+    minigun.fire = True
+    num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+    num objDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+
+    if objDist > $orbitDist
+        move.direction = objective.reldir
+    endif
+    else
+        move.direction = objective.reldir + (pi/2)
+    endelse
+
+    if (enemy.count > 0) && (enemyDist < $defenseDist)
+        minigun.direction = enemy.nearest.reldir #shoot at enemy
+        move.direction = ^enemy.nearest.reldir #run away
+    endif
+    else
+        minigun.direction = objective.reldir
+    endelse
+endelse

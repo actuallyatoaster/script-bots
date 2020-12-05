@@ -117,6 +117,8 @@ If the expression evaluates to true, everything before the endif will be execute
 If it evaluates to false, it will execute the else block (if applicable) then
 resume.
 
+You may nest as many conditionals as you like.
+
 One helpful constant available to you is FIRST_CALL, which will be True if your
 script is being run for the first time, and false otherwise. You should use this
 if you want to declare persistent variables and use them continuously.
@@ -221,37 +223,31 @@ For each weapon equipped to your bot, you have two externals:
 (note that regardless of the value of [scriptName].fire, firing is limited
 by your weapon's rate of fire)
 
+
 3 ERRORS
+
+Errors can be raised for several reasons. These may include assigning variables
+of incorrect types, using operators in unsupported ways, creating a variable
+that already exists, assigning a variable that doesn't exist, or having bad
+syntax.
+
+When your script causes an error, a message with the error and from which script
+it came is displayed in red in the top-left corner of the screen. The console will
+display additional information, including the line on which the error occured.
+Note: the line number provided is 0-indexed and does not include whitespace or 
+comment lines.
+
 
 4 REPL
 
+If you want to test something in BotScript, you can run the scriptables.py file
+to open a REPL. This environment is suitable for testing expressions, but note 
+that no constants are available to you, and the REPL does not support conditionals.
 
-basic syntax, if/else
-^ operator - equivalent to multiplying everything to the rigth by -1
 
-move.speed, move.direction
-bot.x, bot.y
-enemy.count
-enemy.nearest.x, enemy.nearest.y, enemy.nearest.reldir
-equipmentFire
-equipmentDirection
+5 EXAMPLES
 
-builtins
-random
-
-D_TIME
-FIRST_CALL
-pi
-
-A_WIDTH
-A_HEIGHT
-
-rand:x integer between 0(inclusive) and x (exclusive)
-
-extnerals persist
-locals don't
-
-persistent local: $: $ at the start of variable name will designate a
-persistent local variable. If you declare a persistent local variable outside
-of a "if firstCall" conditional, you will get an error as you will be declaring
-the variable every update even though it alreay exists.
+If anything in this text seems unclear, you can look in the bots/scripts folder
+and consult the grunt, heavy, kite, and slicer files. These contain the
+BotScript code that controls the enemy bots. There is also an example.bot file,
+which contains code which illustrates how a user-made bot might behave.

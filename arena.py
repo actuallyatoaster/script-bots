@@ -19,7 +19,7 @@ class Arena():
         self.dims = dims
         self.friendlyBots = []
         self.enemyBots = []
-        self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 500)
+        self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 2000)
         self.money = 1000
 
         self.sidebar = self.buildSidebar()
@@ -46,6 +46,9 @@ class Arena():
 
         for bot in self.enemyBots:
             bot.update(app, self.friendlyBots)
+
+        if self.objective.health <= 0:
+            app.state = "GAMEOVER"
 
     def resume(self, app):
         app.paused = False

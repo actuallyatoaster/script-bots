@@ -99,7 +99,7 @@ class BackButton(UIElems.UIButton):
         loader.saveBotToFile(app.editor.bot, app.editor.botJson)
 
         app.state = "ARENA"
-        app.arena.resume(app)
+        #app.arena.resume(app)
         for botContainer in app.arena.bottomBar.elems:
             botContainer.refresh()
 

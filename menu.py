@@ -33,7 +33,6 @@ def appStarted(app):
     with open('help.txt', 'r') as f:
         app.helpLines = f.read().splitlines()
         f.close()
-    print(app.helpLines)
 
     app.helpLinesPerPage = 33 #How many lines of text to show per page
 
@@ -72,6 +71,13 @@ def drawHelpText(app, canvas, margin = 30, lineSpacing = 18):
         text = app.helpLines[line]
         canvas.create_text(margin, margin + lineSpacing*i,
         text = text, font = 'Arial 12', anchor='nw')
+
+def drawGameOver(app, canvas):
+    cx, cy = app.width/2, app.height/2
+    canvas.create_text(cx, cy, text="Game Over!", font="Arial 24 bold",
+    fill="red")
+    canvas.create_text(cx, cy+30, text="Click anywhere to play again",
+    font="Arial 18")
 
 
 class PlayButton(UIElems.UIButton):

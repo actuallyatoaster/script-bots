@@ -264,3 +264,4 @@ class Objective(Bot): #Objectives are just bots that don't do anything
             self.pos[0]+self.size/2, self.pos[1] + self.size/2, fill="purple", width=0)
 
         canvas.create_text(self.pos[0], self.pos[1], text=f"{self.health}")
+    
