@@ -6,8 +6,10 @@ if FIRST_CALL
 
 endif
 else
+    if 1
     log:489
-    num $b = 2
+    endif
+    #num $b = 2
     #Define how your bot will behave here (called about 20 times/sec)
     move.direction = move.direction + (pi * D_TIME)
     move.speed = 1

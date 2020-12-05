@@ -29,6 +29,15 @@ def appStarted(app):
     app.helpContainer.add(nextButton)
     app.helpContainer.add(prevButton)
 
+    #Load help menu text data
+    with open('help.txt', 'r') as f:
+        app.helpLines = f.read().splitlines()
+        f.close()
+    print(app.helpLines)
+
+    app.helpLinesPerPage = 33 #How many lines of text to show per page
+
+
 def mousePressed(app, event):
     if app.substate == "DEFAULT":
         app.menuSplashContainer.onClick(app, event)
@@ -52,6 +61,18 @@ def drawHelp(app, canvas):
     #Page number
     canvas.create_text(cx, app.height - 45, font="Helvetica 16 bold",
     text=f"Page {app.helpPage+1}")
+
+    drawHelpText(app, canvas)
+
+def drawHelpText(app, canvas, margin = 30, lineSpacing = 18):
+    
+    for i in range(app.helpLinesPerPage):
+        line = app.helpPage * app.helpLinesPerPage + i
+        if line >= len(app.helpLines): break
+        text = app.helpLines[line]
+        canvas.create_text(margin, margin + lineSpacing*i,
+        text = text, font = 'Arial 12', anchor='nw')
+
 
 class PlayButton(UIElems.UIButton):
     def onClick(self, app):

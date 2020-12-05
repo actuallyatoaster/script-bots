@@ -36,7 +36,7 @@ def appStarted(app):
 
     #Now, override the scriptLog function
     def scriptLog(msg):
-        app.toastTime = time.time() #This should be long enough to keep it permanently
+        app.toastTime = time.time()
         app.toast = f"{app.errorBot}: {msg}"
         app.toastColor = "green"
     arena.bots.scriptables.scriptLog = scriptLog
@@ -62,8 +62,8 @@ def timerFired(app):
                 print("ERR: " + app.errorBot)
                 for i in range(len(app.errs), 0, -1):
                     print("---- "+app.errs[i-1])
-                app.toastTime = time.time() #This should be long enough to keep it permanently
-                app.toast = f"Script error: {app.errs[0]}. Consult the console for info"
+                app.toastTime = time.time() + 5#5 sec longer than default toast
+                app.toast = f"Script error: {app.errs[0]}. Check console for info."
                 app.toastColor = "red"
                 app.errs = []
             
