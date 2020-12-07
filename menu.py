@@ -2,6 +2,7 @@
 Main splash screen and help menu
 '''
 import UIElems
+import arena
 
 def appStarted(app):
     cx, cy = app.width/2, app.height/2
@@ -14,6 +15,9 @@ def appStarted(app):
 
     splashHelpButton = HelpButton(cx+margin, cy, 60, 30, label="Help")
     app.menuSplashContainer.add(splashHelpButton)
+
+    presetButton = PlayPresetsButton(cx - (140/2), cy+30+margin, 140, 30, label="Play Preset Mode")
+    app.menuSplashContainer.add(presetButton)
 
     #Setup help screen UI
     helpMargin = 30
@@ -82,7 +86,15 @@ def drawGameOver(app, canvas):
 
 class PlayButton(UIElems.UIButton):
     def onClick(self, app):
+        app.usingPresets = False
         app.state = "ARENA"
+        app.arena = arena.Arena((500,500), app)
+
+class PlayPresetsButton(UIElems.UIButton):
+    def onClick(self, app):
+        app.usingPresets =True
+        app.state = "ARENA"
+        app.arena = arena.Arena((500,500), app)
 
 class HelpButton(UIElems.UIButton):
     def onClick(self, app):

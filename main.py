@@ -20,7 +20,7 @@ def appStarted(app):
 
     app.botBoundsMargin=2
     app.arenaWidth , app.arenaHeight = 500,500
-    app.arena = arena.Arena((500,500))
+    app.arena = None
 
     app.paused = True #Start off paused
     app.pausedTime = 0
@@ -40,9 +40,6 @@ def appStarted(app):
         app.toast = f"{app.errorBot}: {msg}"
         app.toastColor = "green"
     arena.bots.scriptables.scriptLog = scriptLog
-
-    #Starting money
-    app.arena.money += 4000
 
     #Initialize menu stuff
     menu.appStarted(app)

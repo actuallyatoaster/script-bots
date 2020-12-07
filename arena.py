@@ -10,7 +10,7 @@ This file defines the arena environment
 
 
 class Arena():
-    def __init__(self, dims):
+    def __init__(self, dims, app):
         self.wave = 0
         self.waveInterval = 10
         self.endOfLastWave = 0
@@ -20,10 +20,10 @@ class Arena():
         self.friendlyBots = []
         self.enemyBots = []
         self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 2000)
-        self.money = 1000
+        self.money = 5000
 
         self.sidebar = self.buildSidebar()
-        self.bottomBar = self.buildBottomBar()
+        self.bottomBar = self.buildBottomBar("preset" if app.usingPresets else "user")
 
         
 
@@ -115,13 +115,13 @@ class Arena():
         container.add(resumeButton)
         return container
     
-    def buildBottomBar(self):
+    def buildBottomBar(self, prefix):
         bottomBar = UIElems.UIContainer(0, self.dims[1])
         botContainerWidth = 140
 
         for userBotID in range(5):
             bottomBar.add(BotContainer(botContainerWidth * userBotID, 0,
-                f"user-bot{userBotID+1}", True))
+                f"{prefix}-bot{userBotID+1}", True))
 
         return bottomBar
     

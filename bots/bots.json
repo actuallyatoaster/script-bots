@@ -44,46 +44,55 @@
         "script": "bots/scripts/user-bot5.bot"
     },
     "preset-bot1": {
-        "displayName": "PBot 1",
-        "buffs": [
-            "damage",
-            "speed",
-            "health"
-        ],
-        "weapons": [
-            "minigun"
-        ],
-        "script": "bots/scripts/preset-bot1.bot"
-    },
-    "preset-bot2": {
-        "displayName": "PBot 2",
+        "displayName": "Standard",
         "buffs": [],
         "weapons": [
             "standard"
         ],
+        "script": "bots/scripts/preset-bot1.bot"
+    },
+    "preset-bot2": {
+        "displayName": "Speeder",
+        "buffs": [
+            "speed"
+        ],
+        "weapons": [
+            "minigun"
+        ],
         "script": "bots/scripts/preset-bot2.bot"
     },
     "preset-bot3": {
-        "displayName": "PBot 3",
-        "buffs": [],
+        "displayName": "Sniper",
+        "buffs": [
+            "speed",
+            "damage"
+        ],
         "weapons": [
+            "sniper",
             "standard"
         ],
         "script": "bots/scripts/preset-bot3.bot"
     },
     "preset-bot4": {
-        "displayName": "PBot 4",
-        "buffs": [],
+        "displayName": "Heavy",
+        "buffs": [
+            "health",
+            "damage"
+        ],
         "weapons": [
-            "standard"
+            "cloud",
+            "minigun"
         ],
         "script": "bots/scripts/preset-bot4.bot"
     },
     "preset-bot5": {
-        "displayName": "PBot 5",
-        "buffs": [],
+        "displayName": "Laser",
+        "buffs": [
+            "speed",
+            "health"
+        ],
         "weapons": [
-            "standard"
+            "laser"
         ],
         "script": "bots/scripts/preset-bot5.bot"
     }
