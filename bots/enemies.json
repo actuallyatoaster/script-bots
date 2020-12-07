@@ -33,13 +33,13 @@
         "frequency": 2,
         "reward": 700,
         "script": "bots/scripts/kite.bot",
-        "health": 1,
+        "health": 0.6,
         "minWave":5
     },
 
     "heavy":{
         "displayName":"Heavy",
-        "buffs": ["health", "damage"],
+        "buffs": ["damage"],
         "weapons":[
             "cloud"
         ],

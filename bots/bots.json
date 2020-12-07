@@ -1,7 +1,11 @@
 {
     "user-bot1": {
-        "displayName": "Demo",
-        "buffs": [],
+        "displayName": "Bot 1",
+        "buffs": [
+            "damage",
+            "speed",
+            "health"
+        ],
         "weapons": [
             "minigun"
         ],
@@ -38,5 +42,49 @@
             "standard"
         ],
         "script": "bots/scripts/user-bot5.bot"
+    },
+    "preset-bot1": {
+        "displayName": "PBot 1",
+        "buffs": [
+            "damage",
+            "speed",
+            "health"
+        ],
+        "weapons": [
+            "minigun"
+        ],
+        "script": "bots/scripts/preset-bot1.bot"
+    },
+    "preset-bot2": {
+        "displayName": "PBot 2",
+        "buffs": [],
+        "weapons": [
+            "standard"
+        ],
+        "script": "bots/scripts/preset-bot2.bot"
+    },
+    "preset-bot3": {
+        "displayName": "PBot 3",
+        "buffs": [],
+        "weapons": [
+            "standard"
+        ],
+        "script": "bots/scripts/preset-bot3.bot"
+    },
+    "preset-bot4": {
+        "displayName": "PBot 4",
+        "buffs": [],
+        "weapons": [
+            "standard"
+        ],
+        "script": "bots/scripts/preset-bot4.bot"
+    },
+    "preset-bot5": {
+        "displayName": "PBot 5",
+        "buffs": [],
+        "weapons": [
+            "standard"
+        ],
+        "script": "bots/scripts/preset-bot5.bot"
     }
 }

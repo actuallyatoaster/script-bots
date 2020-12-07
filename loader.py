@@ -6,13 +6,13 @@ import bots
 import json
 import random
 
-def loadWeapon(name, arena):
+def loadWeapon(name, arena, damageMod = 1):
     weaponJson = loadJsonFromFile('bots/equipment.json')["weapons"][name]
     sName = weaponJson["scriptName"]
     projSpeed = weaponJson["projectileSpeed"]
     fireRate = weaponJson["fireRate"]
     texture = None #TODO: image loading here
-    damage = weaponJson["damage"]
+    damage = weaponJson["damage"] * damageMod
     rad = weaponJson["projColRad"]
 
     return bots.Equipment(sName, projSpeed,  fireRate, texture, damage, rad)
@@ -33,24 +33,38 @@ def calculateBotCost(name, typeFile = 'bots/enemies.json', baseCost=350, botJson
 
 
 def createBotFromFile(name, arena, position, baseHealth = 60, baseColRad=5, baseSpeed = 75, typeFile = "bots/enemies.json", isEnemy=False):
-    #Need: arena, equipment, script, colRad, position, health, speed
-    botJson = loadJsonFromFile(typeFile)[name]
-    #TODO: speed buffs
-    equipment = [loadWeapon(eq, arena) for eq in botJson["weapons"]]
+    #Get buff info
+    buffs = loadJsonFromFile("bots/equipment.json")["buffs"]
+    hlthBfMod = buffs["health"]["modifier"]
+    spdBfMod = buffs["speed"]["modifier"]
+    dmgBfMod = buffs["damage"]["modifier"]
 
+    hlthMod = spdMod = dmgMod = 1
+
+    botJson = loadJsonFromFile(typeFile)[name]
+
+    #get buff modifiers
+    if "health" in botJson["buffs"]: hlthMod *= hlthBfMod
+    if "speed" in botJson["buffs"]: spdMod *= spdBfMod
+    if "damage" in botJson["buffs"]: dmgMod *= dmgBfMod
+
+    #make equipment list
+    equipment = [loadWeapon(eq, arena, damageMod=dmgMod) for eq in botJson["weapons"]]
+
+    #get the script
     with open(botJson["script"], 'r') as f:
         script = f.read()
         f.close()
-    if "health" in botJson:
-        mod = botJson["health"]
-    else: mod = 1
 
-    if "reward" in botJson:
+    if "health" in botJson: #health scalar for enemies
+        hlthMod *= botJson["health"]
+
+    if "reward" in botJson: #reward value for enemies
         reward = botJson["reward"]
     else: reward = 0
 
-
-    newBot = bots.Bot(arena, equipment, script, baseColRad, position, baseHealth*mod, baseSpeed, isEnemy=isEnemy, reward=reward,name=name )
+    newBot = bots.Bot(arena, equipment, script, baseColRad, position, baseHealth*hlthMod, 
+    baseSpeed*spdMod, isEnemy=isEnemy, reward=reward, name=name)
 
     return newBot
 

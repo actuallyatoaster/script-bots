@@ -1,5 +1,5 @@
 # Write your script here!
-# If you don't know how, look at botscript_docs.txt
+# If you don't know how, check out the help screen
 
 if FIRST_CALL
     #Initialize any variables here, only called once
