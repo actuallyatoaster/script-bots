@@ -20,7 +20,7 @@ class Arena():
         self.friendlyBots = []
         self.enemyBots = []
         self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 2000)
-        self.money = 6000
+        self.money = 6500
 
         self.sidebar = self.buildSidebar()
         self.bottomBar = self.buildBottomBar("preset" if app.usingPresets else "user")
