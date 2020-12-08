@@ -70,12 +70,12 @@ def redrawAll(app, canvas):
         if not app.acknowledged:
             cx, cy = app.width/2, app.height/2
             canvas.create_text(cx, cy-30, text="You are playing Preset Mode",
-                fill="firebrick4", font="Arial 24 bold")
-            canvas.create_text(cx, cy, 
+                fill="red", font="Arial 24 bold")
+            canvas.create_text(cx, cy+5, 
                 text="Bot scripts are already written for you, but you can still edit them if you like",
-                fill="firebrick4")
+                fill="red")
             canvas.create_text(cx, cy+20, text="Click anywhere to continue",
-                fill="firebrick4")
+                fill="red")
     elif app.state == "EDITOR": app.editor.draw(app, canvas)
     elif app.state == "MENU": menu.redrawAll(app, canvas)
     elif app.state == "GAMEOVER": menu.drawGameOver(app, canvas)

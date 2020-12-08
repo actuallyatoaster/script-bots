@@ -67,7 +67,14 @@ class Arena():
         
 
     def draw(self, app, canvas):
-        canvas.create_rectangle(0,0, self.dims[0], self.dims[1], fill="grey")
+        rows = cols = 10
+        rowHeight = self.dims[1]/rows
+        colWidth = self.dims[0]/cols
+        for i in range(rows):
+            for j in range(cols):
+                color = "dimgray" if (i+j) % 2 == 0 else "lightgrey"
+                canvas.create_rectangle(j*colWidth,i*rowHeight, (j+1)*colWidth, 
+                    (i+1)*rowHeight, fill=color, width="0")
 
         for bot in self.friendlyBots + self.enemyBots:
             for eq in bot.equipment:

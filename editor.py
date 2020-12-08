@@ -116,8 +116,13 @@ class ScriptEditButton(UIElems.UIButton):
         bX = self.x + containerX
         bY = self.y + containerY
 
+
+        if app.editor.bot.startswith("user"):
+            path = f"bots/scripts/user/{app.editor.bot}.bot"
+        else:
+            path = f"bots/scripts/presets/{app.editor.bot}.bot"
         canvas.create_text(bX, bY, anchor='nw', font="Arial 16", 
-        text=f"Edit your bot's script by opening the file bots/scripts/{app.editor.bot}.bot")
+        text=f"Edit your bot's script by opening {path}")
 
 #def openFileInDefaultProgram(path):
  #   filepath = f"{os.getcwd()}{os.sep}bots{os.sep}scripts{os.sep}{path}.bot"
