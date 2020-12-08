@@ -20,7 +20,7 @@ class Arena():
         self.friendlyBots = []
         self.enemyBots = []
         self.objective = bots.Objective(self, 40, (dims[0]/2, dims[1]/2), 2000)
-        self.money = 5000
+        self.money = 6000
 
         self.sidebar = self.buildSidebar()
         self.bottomBar = self.buildBottomBar("preset" if app.usingPresets else "user")
@@ -157,12 +157,16 @@ class BotContainer(UIElems.UIContainer):
         self.add(purchaseButton)
         self.refresh()
         self.botSize = 5 #Only for icon
-        self.botDisplayName = loader.loadJsonFromFile("bots/bots.json")[botName]["displayName"]
+        botJson = loader.loadJsonFromFile("bots/bots.json")[botName]
+        self.botDisplayName = botJson["displayName"]
+        self.color = botJson["color"] if "color" in botJson else "blue"
 
     def refresh(self):
         self.cost = loader.calculateBotCost(self.label, typeFile = 'bots/bots.json')
     
     def draw(self, app, canvas):
+        xPos, yPos = super().positionOffset()
+        canvas.create_rectangle(xPos, yPos, xPos + 140, app.height-3, width=2)
         super().draw(app, canvas)
         posX, posY = self.positionOffset()
         #Make label
@@ -178,7 +182,7 @@ class BotContainer(UIElems.UIContainer):
         cy = posY + 200/2
         scale = 3
         canvas.create_oval(cx - scale*self.botSize, cy - scale*self.botSize,
-            cx+scale*self.botSize, cy+scale*self.botSize, fill = "blue", 
+            cx+scale*self.botSize, cy+scale*self.botSize, fill = self.color, 
             width=0)
 
 

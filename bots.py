@@ -48,7 +48,9 @@ def cleanseLocals(locs):
 
 class Bot():
 
-    def __init__(self, arena, equipment, script, collisionRadius, position, health, speed, isEnemy=False, reward = 0, name="enemy"):
+    def __init__(self, arena, equipment, script, collisionRadius, position, health, 
+        speed, isEnemy=False, reward = 0, name="enemy", color="orange"):
+        self.color = color
         self.arena = arena
         self.equipment = equipment
         for eq in self.equipment:
@@ -156,14 +158,9 @@ class Bot():
         self.lastTime = time.time()
     def draw(self, app, canvas):
         #Draw bot itself
-        if self.isEnemy:
-            canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
-                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                            fill = "orange",width=0)
-        else:
-            canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
-                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                            fill = "blue", width=0)
+        canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
+                        self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
+                        fill = self.color, width=0)
 
         #draw health
         canvas.create_text(self.pos[0], self.pos[1]- 10, text=f"{int(self.health)}")
@@ -188,6 +185,7 @@ class Projectile():
         self.collisionRadius = collisionRadius
         self.damage = damage
         self.lastTime = time.time()
+        self.color = "red" if self.origin.bot.isEnemy else "purple4"
     
     #Move the projectile and deal damage if needed
     def update(self, app, bots):
@@ -222,7 +220,7 @@ class Projectile():
     def draw(self, app, canvas):
         canvas.create_oval(self.pos[0] - self.collisionRadius, self.pos[1] - self.collisionRadius,
                            self.pos[0] + self.collisionRadius, self.pos[1] + self.collisionRadius,
-                           fill = "red", width=0)
+                           fill = self.color, width=0)
         
 
 class Equipment():

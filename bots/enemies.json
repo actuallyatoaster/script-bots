@@ -9,7 +9,8 @@
         "reward": 250,
         "script": "bots/scripts/grunt.bot",
         "health": 0.2,
-        "minWave":0
+        "minWave":0,
+        "color": "orange"
     },
 
     "slicer":{
@@ -22,7 +23,8 @@
         "reward": 450,
         "script": "bots/scripts/slicer.bot",
         "health": 0.4,
-        "minWave":2
+        "minWave":2,
+        "color":"OrangeRed2"	
     },
     "kite":{
         "displayName":"Kite",
@@ -34,7 +36,8 @@
         "reward": 700,
         "script": "bots/scripts/kite.bot",
         "health": 0.6,
-        "minWave":5
+        "minWave":5,
+        "color":"OrangeRed4"
     },
 
     "heavy":{
@@ -47,6 +50,7 @@
         "reward": 1500,
         "script": "bots/scripts/heavy.bot",
         "health": 2.5,
-        "minWave":13
+        "minWave":13,
+        "color":"firebrick3"
     }
 }

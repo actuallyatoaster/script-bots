@@ -63,8 +63,13 @@ def createBotFromFile(name, arena, position, baseHealth = 60, baseColRad=5, base
         reward = botJson["reward"]
     else: reward = 0
 
+    if "color" in botJson:
+        color = botJson["color"]
+    else:
+        color = "orange"
+
     newBot = bots.Bot(arena, equipment, script, baseColRad, position, baseHealth*hlthMod, 
-    baseSpeed*spdMod, isEnemy=isEnemy, reward=reward, name=name)
+    baseSpeed*spdMod, isEnemy=isEnemy, reward=reward, name=name, color=color)
 
     return newBot
 

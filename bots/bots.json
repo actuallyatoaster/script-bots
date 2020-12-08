@@ -10,7 +10,7 @@
             "minigun"
         ],
         "script": "bots/scripts/user-bot1.bot",
-        "color":"aquamarine"
+        "color": "aquamarine"
     },
     "user-bot2": {
         "displayName": "Bot 2",
@@ -19,7 +19,7 @@
             "standard"
         ],
         "script": "bots/scripts/user-bot2.bot",
-        "color":"medium spring green"
+        "color": "medium spring green"
     },
     "user-bot3": {
         "displayName": "Bot 3",
@@ -28,7 +28,7 @@
             "standard"
         ],
         "script": "bots/scripts/user-bot3.bot",
-        "color":"LightBlue1"
+        "color": "LightBlue1"
     },
     "user-bot4": {
         "displayName": "Bot 4",
@@ -37,7 +37,7 @@
             "standard"
         ],
         "script": "bots/scripts/user-bot4.bot",
-        "color":"SkyBlue4"
+        "color": "cornflower blue"
     },
     "user-bot5": {
         "displayName": "Bot 5",
@@ -46,7 +46,7 @@
             "standard"
         ],
         "script": "bots/scripts/user-bot5.bot",
-        "color":"cyan"
+        "color": "cyan"
     },
     "preset-bot1": {
         "displayName": "Standard",
@@ -55,7 +55,7 @@
             "standard"
         ],
         "script": "bots/scripts/preset-bot1.bot",
-        "color":"aquamarine"
+        "color": "aquamarine"
     },
     "preset-bot2": {
         "displayName": "Speeder",
@@ -66,7 +66,7 @@
             "minigun"
         ],
         "script": "bots/scripts/preset-bot2.bot",
-        "color":"medium spring green"
+        "color": "medium spring green"
     },
     "preset-bot3": {
         "displayName": "Sniper",
@@ -79,7 +79,7 @@
             "standard"
         ],
         "script": "bots/scripts/preset-bot3.bot",
-        "color":"LightBlue1"
+        "color": "LightBlue1"
     },
     "preset-bot4": {
         "displayName": "Heavy",
@@ -92,7 +92,7 @@
             "minigun"
         ],
         "script": "bots/scripts/preset-bot4.bot",
-        "color":"SkyBlue4"
+        "color": "cornflower blue"
     },
     "preset-bot5": {
         "displayName": "Laser",
@@ -104,6 +104,6 @@
             "laser"
         ],
         "script": "bots/scripts/preset-bot5.bot",
-        "color":"cyan"
+        "color": "cyan"
     }
 }
