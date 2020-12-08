@@ -17,4 +17,7 @@ else
         move.direction = enemy.nearest.reldir + (pi/2)
     endelse
     sniper.direction = enemy.nearest.reldir
+    if enemy.count == 0
+        sniper.direction = objective.reldir
+    endif
 endelse

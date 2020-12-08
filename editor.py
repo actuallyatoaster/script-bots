@@ -2,9 +2,8 @@
 This file defines the editor that opens when the player edits a bot.
 It more or less functions like a standalone app
 '''
-import subprocess, os, platform #This is just for opening the file in default program,
+import subprocess, os#This is just for opening the file in default program,
 # From: https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
-
 
 import UIElems
 import loader
@@ -38,10 +37,10 @@ class Editor():
         
         buttonsOffset = 2.5*self.titleOffset + max(len(self.weapons), len(self.buffs))*self.checkMargin
 
-        scriptEditButton = ScriptEditButton(0, buttonsOffset, 80, 30, "Open Script")
+        scriptEditButton = ScriptEditButton(0, buttonsOffset, 100, 30, "Open Script")
         self.container.add(scriptEditButton)
 
-        backButton = BackButton(0, buttonsOffset+scriptEditButton.height + self.margin, 60, 30, "Back")
+        backButton = BackButton(0, buttonsOffset+scriptEditButton.height + self.margin+80, 60, 30, "Back")
         self.totalCost = loader.calculateBotCost(self.bot, typeFile = 'bots/bots.json')
         self.container.add(backButton)
 
@@ -107,10 +106,10 @@ class BackButton(UIElems.UIButton):
 
 class ScriptEditButton(UIElems.UIButton):
     def onClick(self, app):
-        #openFileInDefaultProgram(app.editor.bot)
-        pass
+        openFileInDefaultProgram(app.editor.bot)
 
     def draw(self, app, canvas):
+        super().draw(app, canvas)
         containerX, containerY = self.container.positionOffset()
         #position is relative to container
         bX = self.x + containerX
@@ -121,16 +120,25 @@ class ScriptEditButton(UIElems.UIButton):
             path = f"bots/scripts/user/{app.editor.bot}.bot"
         else:
             path = f"bots/scripts/presets/{app.editor.bot}.bot"
-        canvas.create_text(bX, bY, anchor='nw', font="Arial 16", 
-        text=f"Edit your bot's script by opening {path}")
+        canvas.create_text(bX, bY+40, anchor='nw', font="Arial 12", 
+        text=f"The above button may not work on all platforms.")
+        canvas.create_text(bX, bY+60, anchor='nw', font="Arial 12", 
+        text=f"If it doesn't, try setting a default program for '.bot' files.")
+        canvas.create_text(bX, bY+80, anchor='nw', font="Arial 12", 
+        text=f"Or, open the file manually at {path}")
 
-#def openFileInDefaultProgram(path):
- #   filepath = f"{os.getcwd()}{os.sep}bots{os.sep}scripts{os.sep}{path}.bot"
-  #  #From https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
-   # #I did not write anything below this point
-    #if platform.system() == 'Darwin':       # macOS
-     #   subprocess.call(('open', filepath))
-    #elif platform.system() == 'Windows':    # Windows
-     #   os.startfile(filepath)
-    #else:                                   # linux variants
-     #   subprocess.call(('xdg-open', filepath))
+def openFileInDefaultProgram(path):
+    s= os.sep
+    if path.startswith("user"):
+        filepath = f"bots{s}scripts{s}user{s}{path}.bot"
+    else:
+        filepath = f"bots{s}scripts{s}presets{s}{path}.bot"
+    print(filepath)
+    #From https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+    #I did not write this !!!
+    try:
+        os.system("start " + filepath)
+    except err: print(err)
+    try:
+        os.system("open " + filepath)
+    except:pass

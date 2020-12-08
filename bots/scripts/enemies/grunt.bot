@@ -29,4 +29,7 @@ else
         move.speed = 1
         standard.direction = objective.reldir
     endelse
+    if enemy.count == 0
+        standard.direction = objective.reldir
+    endif
 endelse
