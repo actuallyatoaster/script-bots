@@ -87,14 +87,18 @@ def drawGameOver(app, canvas):
 class PlayButton(UIElems.UIButton):
     def onClick(self, app):
         app.usingPresets = False
+        app.acknowledged = True
         app.state = "ARENA"
         app.arena = arena.Arena((500,500), app)
+
 
 class PlayPresetsButton(UIElems.UIButton):
     def onClick(self, app):
         app.usingPresets =True
+        app.acknowledged = False
         app.state = "ARENA"
         app.arena = arena.Arena((500,500), app)
+
 
 class HelpButton(UIElems.UIButton):
     def onClick(self, app):

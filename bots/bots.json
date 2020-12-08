@@ -9,7 +9,7 @@
         "weapons": [
             "minigun"
         ],
-        "script": "bots/scripts/user-bot1.bot",
+        "script": "bots/scripts/user/user-bot1.bot",
         "color": "aquamarine"
     },
     "user-bot2": {
@@ -18,7 +18,7 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot2.bot",
+        "script": "bots/scripts/user/user-bot2.bot",
         "color": "medium spring green"
     },
     "user-bot3": {
@@ -27,7 +27,7 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot3.bot",
+        "script": "bots/scripts/user/user-bot3.bot",
         "color": "LightBlue1"
     },
     "user-bot4": {
@@ -36,7 +36,7 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot4.bot",
+        "script": "bots/scripts/user/user-bot4.bot",
         "color": "cornflower blue"
     },
     "user-bot5": {
@@ -45,7 +45,7 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot5.bot",
+        "script": "bots/scripts/user/user-bot5.bot",
         "color": "cyan"
     },
     "preset-bot1": {
@@ -54,7 +54,7 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/preset-bot1.bot",
+        "script": "bots/scripts/presets/preset-bot1.bot",
         "color": "aquamarine"
     },
     "preset-bot2": {
@@ -65,7 +65,7 @@
         "weapons": [
             "minigun"
         ],
-        "script": "bots/scripts/preset-bot2.bot",
+        "script": "bots/scripts/presets/preset-bot2.bot",
         "color": "medium spring green"
     },
     "preset-bot3": {
@@ -78,7 +78,7 @@
             "sniper",
             "standard"
         ],
-        "script": "bots/scripts/preset-bot3.bot",
+        "script": "bots/scripts/presets/preset-bot3.bot",
         "color": "LightBlue1"
     },
     "preset-bot4": {
@@ -91,7 +91,7 @@
             "cloud",
             "minigun"
         ],
-        "script": "bots/scripts/preset-bot4.bot",
+        "script": "bots/scripts/presets/preset-bot4.bot",
         "color": "cornflower blue"
     },
     "preset-bot5": {
@@ -103,7 +103,7 @@
         "weapons": [
             "laser"
         ],
-        "script": "bots/scripts/preset-bot5.bot",
+        "script": "bots/scripts/presets/preset-bot5.bot",
         "color": "cyan"
     }
 }

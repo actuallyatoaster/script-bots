@@ -7,7 +7,7 @@
         ],
         "frequency": 18,
         "reward": 250,
-        "script": "bots/scripts/grunt.bot",
+        "script": "bots/scripts/enemies/grunt.bot",
         "health": 0.2,
         "minWave":0,
         "color": "orange"
@@ -21,7 +21,7 @@
         ],
         "frequency": 4,
         "reward": 450,
-        "script": "bots/scripts/slicer.bot",
+        "script": "bots/scripts/enemies/slicer.bot",
         "health": 0.4,
         "minWave":2,
         "color":"OrangeRed2"	
@@ -34,7 +34,7 @@
         ],
         "frequency": 2,
         "reward": 700,
-        "script": "bots/scripts/kite.bot",
+        "script": "bots/scripts/enemies/kite.bot",
         "health": 0.6,
         "minWave":5,
         "color":"OrangeRed4"
@@ -48,7 +48,7 @@
         ],
         "frequency": 1,
         "reward": 1500,
-        "script": "bots/scripts/heavy.bot",
+        "script": "bots/scripts/enemies/heavy.bot",
         "health": 2.5,
         "minWave":13,
         "color":"firebrick3"

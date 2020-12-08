@@ -48,7 +48,7 @@ def timerFired(app):
     if app.paused:
         app.pausedTime = time.time() - app.pauseStart
     else:
-        if app.state == "ARENA":
+        if app.state == "ARENA" and app.acknowledged:
             try:
                 app.arena.update(app)
             except arena.bots.scriptables.ScriptError:
@@ -65,7 +65,17 @@ def timerFired(app):
                 app.errs = []
             
 def redrawAll(app, canvas):
-    if app.state == "ARENA":app.arena.draw(app, canvas)
+    if app.state == "ARENA":
+        app.arena.draw(app, canvas)
+        if not app.acknowledged:
+            cx, cy = app.width/2, app.height/2
+            canvas.create_text(cx, cy-30, text="You are playing Preset Mode",
+                fill="firebrick4", font="Arial 24 bold")
+            canvas.create_text(cx, cy, 
+                text="Bot scripts are already written for you, but you can still edit them if you like",
+                fill="firebrick4")
+            canvas.create_text(cx, cy+20, text="Click anywhere to continue",
+                fill="firebrick4")
     elif app.state == "EDITOR": app.editor.draw(app, canvas)
     elif app.state == "MENU": menu.redrawAll(app, canvas)
     elif app.state == "GAMEOVER": menu.drawGameOver(app, canvas)
@@ -75,7 +85,11 @@ def redrawAll(app, canvas):
     
 
 def mousePressed(app, event):
-    if app.state == "ARENA":app.arena.onClick(app, event)
+    if app.state == "ARENA":
+        if app.acknowledged:
+            app.arena.onClick(app, event)
+        else:
+            app.acknowledged = True
     elif app.state == "EDITOR": app.editor.onClick(app, event)
     elif app.state == "MENU": menu.mousePressed(app, event)
     elif app.state == "GAMEOVER":
