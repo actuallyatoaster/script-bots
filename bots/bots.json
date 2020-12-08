@@ -9,7 +9,8 @@
         "weapons": [
             "minigun"
         ],
-        "script": "bots/scripts/user-bot1.bot"
+        "script": "bots/scripts/user-bot1.bot",
+        "color":"aquamarine"
     },
     "user-bot2": {
         "displayName": "Bot 2",
@@ -17,7 +18,8 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot2.bot"
+        "script": "bots/scripts/user-bot2.bot",
+        "color":"medium spring green"
     },
     "user-bot3": {
         "displayName": "Bot 3",
@@ -25,7 +27,8 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot3.bot"
+        "script": "bots/scripts/user-bot3.bot",
+        "color":"LightBlue1"
     },
     "user-bot4": {
         "displayName": "Bot 4",
@@ -33,7 +36,8 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot4.bot"
+        "script": "bots/scripts/user-bot4.bot",
+        "color":"SkyBlue4"
     },
     "user-bot5": {
         "displayName": "Bot 5",
@@ -41,7 +45,8 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/user-bot5.bot"
+        "script": "bots/scripts/user-bot5.bot",
+        "color":"cyan"
     },
     "preset-bot1": {
         "displayName": "Standard",
@@ -49,7 +54,8 @@
         "weapons": [
             "standard"
         ],
-        "script": "bots/scripts/preset-bot1.bot"
+        "script": "bots/scripts/preset-bot1.bot",
+        "color":"aquamarine"
     },
     "preset-bot2": {
         "displayName": "Speeder",
@@ -59,7 +65,8 @@
         "weapons": [
             "minigun"
         ],
-        "script": "bots/scripts/preset-bot2.bot"
+        "script": "bots/scripts/preset-bot2.bot",
+        "color":"medium spring green"
     },
     "preset-bot3": {
         "displayName": "Sniper",
@@ -71,7 +78,8 @@
             "sniper",
             "standard"
         ],
-        "script": "bots/scripts/preset-bot3.bot"
+        "script": "bots/scripts/preset-bot3.bot",
+        "color":"LightBlue1"
     },
     "preset-bot4": {
         "displayName": "Heavy",
@@ -83,7 +91,8 @@
             "cloud",
             "minigun"
         ],
-        "script": "bots/scripts/preset-bot4.bot"
+        "script": "bots/scripts/preset-bot4.bot",
+        "color":"SkyBlue4"
     },
     "preset-bot5": {
         "displayName": "Laser",
@@ -94,6 +103,7 @@
         "weapons": [
             "laser"
         ],
-        "script": "bots/scripts/preset-bot5.bot"
+        "script": "bots/scripts/preset-bot5.bot",
+        "color":"cyan"
     }
 }

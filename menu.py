@@ -95,6 +95,7 @@ class PlayPresetsButton(UIElems.UIButton):
         app.usingPresets =True
         app.state = "ARENA"
         app.arena = arena.Arena((500,500), app)
+        app.arena.money+=1000000
 
 class HelpButton(UIElems.UIButton):
     def onClick(self, app):

@@ -4,11 +4,11 @@
             "displayName": "Standard Gun",
             "scriptName": "standard",
             "projectileSpeed": 170,
-            "fireRate": 5,
+            "fireRate": 4,
             "spritePath": "",
-            "damage": 4,
+            "damage": 3,
             "projColRad": 2,
-            "cost": 150
+            "cost": 350
         },
 
         "cloud":{
@@ -19,17 +19,17 @@
             "spritePath": "",
             "damage": 8,
             "projColRad": 5,
-            "cost": 1000
+            "cost": 2000
         },
 
         "sniper": {
             "displayName": "Sniper Rifle",
             "scriptName": "sniper",
-            "projectileSpeed": 1000,
-            "fireRate": 2,
+            "projectileSpeed": 1500,
+            "fireRate": 1.2,
             "spritePath": "",
-            "damage": 13,
-            "projColRad": 2,
+            "damage": 15,
+            "projColRad": 4,
             "cost": 800
         },
 
@@ -47,12 +47,12 @@
         "laser":{
             "displayName": "Laser",
             "scriptName": "laser",
-            "projectileSpeed": 2000,
+            "projectileSpeed": 2500,
             "fireRate": 1000000,
             "spritePath": "",
             "damage": 0.25,
-            "projColRad": 3,
-            "cost": 9000
+            "projColRad": 4,
+            "cost": 17000
         }
     },
 

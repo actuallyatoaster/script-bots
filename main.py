@@ -80,7 +80,7 @@ def mousePressed(app, event):
     elif app.state == "MENU": menu.mousePressed(app, event)
     elif app.state == "GAMEOVER":
         appStarted(app)
-        app.state = "ARENA"
+        app.state = "MENU"
 
 
 runApp(width=700, height=700)

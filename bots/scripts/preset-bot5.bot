@@ -1,0 +1,32 @@
+# Based off of Sniper, basicall that with a laser
+
+if FIRST_CALL
+    num $kiteDist = 170
+    num $holdDist = 200 + rand:60
+endif
+else
+    if enemy.count > 0
+        laser.fire = True
+        laser.direction = enemy.nearest.reldir
+        num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+        if enemyDist < $kiteDist
+            move.direction = enemy.nearest.reldir
+            move.speed = ^1
+        endif
+        else
+            move.speed = 0.5
+            move.direction = enemy.nearest.reldir + (pi/2)
+        endelse
+    endif
+    else
+        move.speed=1
+        laser.fire = False
+        num objDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+        if objDist > $holdDist
+            move.direction = objective.reldir
+        endif
+        else
+            move.direction = objective.reldir + (pi/2)
+        endelse
+    endelse
+endelse

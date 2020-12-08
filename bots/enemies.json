@@ -5,7 +5,7 @@
         "weapons":[
             "standard"
         ],
-        "frequency": 20,
+        "frequency": 18,
         "reward": 250,
         "script": "bots/scripts/grunt.bot",
         "health": 0.2,

@@ -4,14 +4,11 @@ functions. The core of the file is the ScriptEnvironment class, wherein scripts
 and their variables are stored, and scripts are parsed and run.
 '''
 
-# TODO: all the code relating to parsing expressions is really messy and should
-# be reworked if time allows
 import string
 import math
 import random
 
 #Some configuration for the script environment
-#TODO: move this to a config file
 SCRIPT_CONFIG = {
     "NUM_INT_TOLERANCE": 10**(-6),# tolerance for floats to be converted to ints
 }
@@ -601,7 +598,7 @@ class ScriptEnvironment():
             else:
                 return self.locs, self.externals
         except ScriptError:
-            scriptError(f"Error on {self.instructionIndex}:{self.lines[self.instructionIndex]}")
+            scriptError(f"Error on line {self.instructionIndex}: {self.lines[self.instructionIndex]}")
             return
 
     #Execute a given line, return the new instructionIndex

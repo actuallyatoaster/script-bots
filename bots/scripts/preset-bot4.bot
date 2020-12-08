@@ -1,0 +1,46 @@
+# Similar to the AI Heavy bot, except it has a point-defense minigun,
+# Circles the objective, shoots in 45-degree arc in direction of nearest enemy
+
+if FIRST_CALL
+    num $min = objective.reldir - (pi/2)
+    num $max = objective.reldir + (pi/2)
+    cloud.direction = objective.reldir
+    cloud.fire = True
+    num $moveDir = 1
+    num $moveSpeed = pi
+    num $orbitDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+    bool $fresh = True
+    num $pointDefenseDist = 300
+endif
+else
+    cloud.direction = cloud.direction + (D_TIME*$moveDir*$moveSpeed)
+    if cloud.direction <= $min
+        $moveDir = 1
+    endif
+    if cloud.direction >= $max
+        $moveDir = ^1
+    endif
+
+    move.direction = objective.reldir + (pi/2)
+    move.speed = 0.5
+
+    minigun.fire = False
+    if enemy.count > 0
+        num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+        if $fresh
+            cloud.direction = enemy.nearest.reldir
+        endif
+        $max = enemy.nearest.reldir + (pi/4)
+        $min = enemy.nearest.reldir - (pi/4)
+        $fresh = False
+        if enemyDist < $pointDefenseDist
+            minigun.direction = enemy.nearest.reldir
+            minigun.fire = True
+        endif
+    endif
+    else
+        $max = objective.reldir + (pi/2)
+        $min = objective.reldir - (pi/2)
+        $fresh = True
+    endelse
+endelse

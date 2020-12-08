@@ -1,0 +1,41 @@
+# Based off of Kite enemy + a point-defense standard weapon
+
+if FIRST_CALL
+    num $kiteDist = 280
+    num $pointDefenseDist = 300
+    num $holdDist = 50 + rand:60
+endif
+else
+    if enemy.count > 0
+        sniper.fire = True
+        sniper.direction = enemy.nearest.reldir
+        num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+        if enemyDist < $kiteDist
+            move.direction = enemy.nearest.reldir
+            move.speed = ^1
+        endif
+        else
+            move.speed = 0.5
+            move.direction = enemy.nearest.reldir + (pi/2)
+        endelse
+        if enemyDist < $pointDefenseDist
+            standard.direction = enemy.nearest.reldir
+            standard.fire = True
+        endif
+        else
+            standard.fire = False
+        endelse
+    endif
+    else
+        move.speed=1
+        sniper.fire = False
+        standard.fire = False
+        num objDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+        if objDist > $holdDist
+            move.direction = objective.reldir
+        endif
+        else
+            move.direction = objective.reldir + (pi/2)
+        endelse
+    endelse
+endelse

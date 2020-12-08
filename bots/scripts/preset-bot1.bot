@@ -1,0 +1,39 @@
+standard.fire = True
+standard.direction = enemy.nearest.reldir #aim at enemy
+#initialize everything
+if FIRST_CALL
+    #initialize movement
+    move.speed = 1
+    num $kiteDistance = 70
+    bool $wasEnemies = True
+endif
+
+#normal loop case
+else 
+    if enemy.count > 0
+        standard.fire = True
+        #movement
+        move.direction = enemy.nearest.reldir
+        move.speed = 1
+        num enemyDist = (((bot.x-enemy.nearest.x)**2)+ ((bot.y-enemy.nearest.y)**2))**(1/2)
+        if enemyDist <= 30
+            move.direction = enemy.nearest.reldir + (pi/2)
+        endif
+        $wasEnemies = True
+    endif
+    else
+        if $wasEnemies
+            move.speed = ((rand:16)+1)/16
+            $kiteDistance = 30 + rand:80
+            $wasEnemies = False
+        endif
+        standard.fire=False
+        num objDist = (((bot.x-objective.x)**2)+ ((bot.y-objective.y)**2))**(1/2)
+        if objDist > $kiteDistance + 3
+            move.direction = objective.reldir
+        endif
+        else
+            move.direction = objective.reldir + (pi/2)
+        endelse
+    endelse
+endelse
