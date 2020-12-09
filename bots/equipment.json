@@ -50,7 +50,7 @@
             "projectileSpeed": 2500,
             "fireRate": 1000000,
             "spritePath": "",
-            "damage": 0.25,
+            "damage": 1,
             "projColRad": 4,
             "cost": 17000
         }

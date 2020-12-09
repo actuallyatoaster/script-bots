@@ -25,7 +25,12 @@ class Arena():
         self.sidebar = self.buildSidebar()
         self.bottomBar = self.buildBottomBar("preset" if app.usingPresets else "user")
 
-        
+        self.botsDestroyed = 0
+        self.botsLost = 0
+        self.damageDone = 0
+        self.damageReceived = 0
+
+    
 
     def update(self, app):
 
@@ -94,6 +99,23 @@ class Arena():
         self.sidebar.draw(app, canvas)
         self.bottomBar.draw(app, canvas)
     
+    def drawStats(self, app,canvas):
+        vertOffset = 200
+        tMargin = 40
+        sMargin = 20
+        l = self.dims[0] + sMargin
+        h = vertOffset
+        canvas.create_text(l, h, anchor="nw", text="Game Stats", font="Arial 20 bold")
+        h+=tMargin
+        sf = "Helvetica 14"
+        canvas.create_text(l,h, anchor="nw", text=f"Damage done: {int(self.damageDone)}", font=sf)
+        h+=sMargin
+        canvas.create_text(l,h, anchor="nw", text=f"Damage taken: {int(self.damageReceived)}", font=sf)
+        h+=sMargin
+        canvas.create_text(l,h, anchor="nw", text=f"Bots destroyed: {self.botsDestroyed}", font=sf)
+        h+=sMargin
+        canvas.create_text(l,h, anchor="nw", text=f"Bots lost: {self.botsLost}", font=sf)
+
     def onClick(self, app, event):
         self.sidebar.onClick(app, event)
         self.bottomBar.onClick(app, event)
@@ -145,6 +167,8 @@ class Arena():
         moneyOffset = coolDownOffset + 45
         canvas.create_text(self.dims[1]+ margin, margin + moneyOffset, anchor='nw',
             font = 'Arial 18', text = f"Money: ${self.money}")
+
+        self.drawStats(app, canvas)
 
 #Buttons that appear for each bot in the bottom bar
 class BotContainer(UIElems.UIContainer):

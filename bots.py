@@ -167,10 +167,17 @@ class Bot():
     def damage(self, dmg):
         self.health -= dmg
         if self.health <= 0:
-            if self in self.arena.friendlyBots: self.arena.friendlyBots.remove(self)
+            if self in self.arena.friendlyBots: 
+                self.arena.friendlyBots.remove(self)
+                self.arena.botsLost += 1
             elif self in self.arena.enemyBots: 
                 self.arena.enemyBots.remove(self)
                 self.arena.money += self.reward
+                self.arena.botsDestroyed += 1
+        if self.isEnemy:
+            self.arena.damageDone += dmg
+        else:
+            self.arena.damageReceived += dmg
 
 
 class Projectile():
@@ -254,6 +261,7 @@ class Objective(Bot): #Objectives are just bots that don't do anything
         self.health = health
         self.collisionRadius = size/2
         self.size = size
+        self.isEnemy = False
 
     def update(self, _): pass #Make it so the update function does nothing
 
