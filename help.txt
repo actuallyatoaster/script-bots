@@ -33,7 +33,7 @@ for the purpose of programming bots.
 A valid statement in BotScript falls into one of three categories: variable
 assignment, conditionals, or logging/printing.
 
-All whitespace except new lines is completely removed and therfore ignored during
+All whitespace except new lines is completely removed and therefore ignored during
 parsing.
 
 You may only have one statement per line.
@@ -50,7 +50,7 @@ but not used for anything.
 
 There are two variable types: num and bool, or Numbers and Booleans. A num can
 be positive or negative, integer or float. If you have a num that is a float
-extremely close to an integer valuem, it will automatically be rounded to an integer.
+extremely close to an integer value, it will automatically be rounded to an integer.
 A bool can take two values: True or False.
 
 To create a variable, type [num or bool] [variable name] = [expression]
@@ -188,7 +188,7 @@ enemy.count: num, the number of enemies currently in the Arena
 enemy.nearest.x: num, the x position of the nearest enemy bot
 enemy.nearest.y: num, the y position of the nearest enemy bot
 
-enemy.nearest.reldir: num the direction of the enemy relative to you, in radians
+enemy.nearest.reldir: num, the direction of the enemy relative to you, in radians
 (ie, what direction you must shoot or move in to be aiming at the enemy bot)
 
 enemy.nearest.move.direction: num, the direction the enemy is moving, in radians
@@ -250,4 +250,6 @@ that no constants are available to you, and the REPL does not support conditiona
 If anything in this text seems unclear, you can look in the bots/scripts folder
 and consult the grunt, heavy, kite, and slicer files. These contain the
 BotScript code that controls the enemy bots. There is also an example.bot file,
-which contains code which illustrates how a user-made bot might behave.
+which contains code which illustrates how a user-made bot might behave. You may
+also check the preset files, which are the default scripts for bots in preset
+mode.

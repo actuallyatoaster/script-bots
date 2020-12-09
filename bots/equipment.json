@@ -47,11 +47,11 @@
         "laser":{
             "displayName": "Laser",
             "scriptName": "laser",
-            "projectileSpeed": 2500,
+            "projectileSpeed": 2000,
             "fireRate": 1000000,
             "spritePath": "",
-            "damage": 1,
-            "projColRad": 4,
+            "damage": 4,
+            "projColRad": 5,
             "cost": 17000
         }
     },
